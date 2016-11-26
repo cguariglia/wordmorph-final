@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "utils.h"
-#include "graphs.h"
+#include "datastructs.h"
 
 /* In this file:
  * Functions that are directly linked to solving the given problem. */
@@ -31,7 +32,7 @@ void initDictionary(FILE *dic, FILE *prob) {
 
 /* Second read of the problems file, in which the problems are actually solved and written to the output file.
  * Basically the main function of the whole program. */
-void problemSolver(FILE *prob, FILE* dic) {
+void problemSolver(FILE *dic, FILE *prob) {
     char aux1[MAX_STRING], aux2[MAX_STRING];
 	int max_change;
     

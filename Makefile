@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS =-O3 -Wall -ansi
-DEPS = lists.h words.h utils.h
-OBJ = lists.o utils.o utils.o main.o
+DEPS = datastructs.h words.h utils.h
+OBJ = datastructs.o utils.o words.o main.o
 
 %.o: %.c $(DEPS)
 		$(CC) $(CFLAGS) -c -o $@ $< 

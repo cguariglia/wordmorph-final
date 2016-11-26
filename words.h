@@ -7,6 +7,6 @@
 
 void problemCounter(FILE *prob, int *problem_array);
 void initDictionary(FILE *dic, FILE *prob);
-void problemSolver(FILE* dic, FILE *prob);
+void problemSolver(FILE *dic, FILE *prob);
 
 #endif
