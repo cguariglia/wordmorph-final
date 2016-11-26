@@ -27,3 +27,18 @@ FILE * fcheck(char *fname, char *ext) {
 	
 	return f;
 }
+
+/* */
+char* outputFileExtension(char * name_input){
+	char *name_output, *dot;
+	
+	name_output = (char *)allocate(strlen(name_input) + 2);
+	dot = strrchr(name_input, '.');
+	
+	*dot = '\0';
+	
+	strcat(name_input, ".path");
+	strcpy(name_output, name_input);
+	
+	return name_output;
+}
