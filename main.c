@@ -1,4 +1,4 @@
-/* WORDMORPH
+/* WORDMORPH - FINAL
  * Authors: Ana Carolina Lima & Carina Fernandes
  * */
 

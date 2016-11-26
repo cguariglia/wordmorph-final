@@ -7,6 +7,6 @@
 
 void * allocate(size_t);
 FILE * fcheck(char *, char *);
-char* outputFileExtension(char * name_input, char *new_ext);
+char* outputFileExtension(char * name_input);
 
 #endif

@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/* In this file:
+ * Functions that wouldn't fit in any other file, mostly related to dealing with the files themselves. */
+
 /* Wrapper function around malloc, including check for memory allocation failure. */
 void * allocate(size_t size) {
 	void *ptr;
@@ -28,7 +31,7 @@ FILE * fcheck(char *fname, char *ext) {
 	return f;
 }
 
-/* */
+/* Given a name and a desired file extension, returns the new filename */
 char* outputFileExtension(char * name_input){
 	char *name_output, *dot;
 	
@@ -42,3 +45,25 @@ char* outputFileExtension(char * name_input){
 	
 	return name_output;
 }
+
+/* Binary search. */
+int binarySearch(char *array[], int size, char *value) {
+	int left, right, middle;
+	
+	left = 0;
+	right = size;
+	
+	while(left <= right) {
+		middle = (right + left) / 2;
+		
+		if(strcmp(array[middle], value) > 0)
+			right = middle - 1;
+		else if(strcmp(array[middle], value) < 0)
+			left = middle + 1;
+		else 
+			return middle;
+	}
+	
+	return -1;
+}
+
