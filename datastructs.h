@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_WT 100
+
 typedef struct _node node;
 typedef void * Item;
 typedef struct graph graph;
@@ -21,5 +23,10 @@ graph * graphInit(int vert_num);
 queue * queueInit(int size);
 int queueIsEmpty(queue *q);
 void insertInQueue(queue *q, Item data);
+void fixUp(queue *q, int idx);
+void fixDown(queue *q, int idx, int n);
+Item *emptyHeap(queue *q);
+Item removeHeap();
+void Dijkstra(graph *g, int s, int *st, double *wt);
 
 #endif
