@@ -7,14 +7,18 @@
 #define MAX_WT 100
 
 typedef struct _node node;
-typedef void * Item;
 typedef struct graph graph;
 typedef struct edge edge;
 typedef struct queue queue;
 
+typedef struct {
+    int vertex; 
+    int weight;
+} Item;
+
 node * initLinkedList();
 node * newNode(Item data, node *next);
-node * getData(node *cur);
+Item getData(node *cur);
 void freeLinkedList(node *head, void (* freeItem)(Item));
 node * nextNode(node *cur);
 

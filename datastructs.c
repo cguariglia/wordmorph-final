@@ -16,11 +16,6 @@ struct graph {
     node **adj;
 };
 
-struct edge {
-    Item v;
-    Item w;  
-};
-
 struct queue {
     int size;
     int first;
@@ -49,11 +44,31 @@ node * nextNode(node *cur) {
     return ((cur == NULL) ? NULL : cur->next);
 }
 
-node * getData(node *cur) {
+Item getData(node *cur) {
     if(cur == NULL)
-        return NULL;
+        exit(0);
     else
         return cur->data;
+}
+
+/* Inserts node in such a way as to make a sorted list.
+ * compFunc must return < 0 if the first item is smaller than the next, = 0 if it's the same and > 0 if it's bigger */
+node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2)) {
+	node *aux, *new_node, *new_first;
+	
+	for(aux = first; aux != NULL; aux = aux->next) {
+		if(compFunc(item, aux->next->data) > 0) {
+			new_node = newNode(item, aux->next);
+			aux->next = new_node;
+            
+			if(aux == first)
+				new_first = new_node;
+			else
+				new_first = first;
+		}
+	}
+
+	return new_first;
 }
 
 void freeLinkedList(node *head, void (* freeItem)(Item)) {
@@ -98,6 +113,18 @@ void insertVertex(graph *g, int index, Item data) {
     return;
 }
 
+void freeGraph(graph *g, void (* freeItem)(Item)) {
+    int i;
+    
+    for (i = 0; i < g->vertices; i++)
+        freeLinkedList(g->adj[i], freeItem);
+        
+    free(g->adj);
+    free(g);
+    
+    return;
+}
+
 /* Heap definitions: */
 
 queue * queueInit(int size) {
@@ -134,7 +161,7 @@ void insertInHeap(queue *q, Item data) {
 void fixUp(queue *q, int idx) {
 	Item aux;
 	
-	while (idx > 0 && (q->data[(idx-1)/2] > q->data[idx])) {		
+	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {		
         aux = q->data[idx];
         q->data[idx] = q->data[(idx-1)/2];
         q->data[(idx-1)/2] = aux;
@@ -153,10 +180,10 @@ void fixDown(queue *q, int idx, int n) {
 	while (2 * idx < n - 1){
 		child = 2 * idx + 1;
 		
-		if(child < (n - 1) && (q->data[child] > q->data[child+1]))
+		if(child < (n - 1) && compItem(q->data[child], q->data[child+1]) > 0)
             child++;
 		
-		if(!(q->data[idx] > q->data[child]))
+		if(compItem(q->data[idx], q->data[child]) < 0)
             break;
 		
 		aux = q->data[idx];
@@ -169,10 +196,6 @@ void fixDown(queue *q, int idx, int n) {
     return;
 }
 
-
-Item *emptyHeap(queue *q) {	
-    if (q->data == NULL) return NULL;
-}
 
 /* retira o elemento de mais baixa prioridade*/
 Item removeHeap(queue *q) {
