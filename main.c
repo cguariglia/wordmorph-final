@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
+#include "words.h"
 
 int main(int argc, char **argv) {
 	FILE *fpdic, *fpprob;
@@ -16,6 +17,8 @@ int main(int argc, char **argv) {
 	/* Verify file extensions and open Input files*/
 	fpdic = fcheck(argv[1], ".dic");
 	fpprob = fcheck(argv[2], ".pal");
+    
+    problemSolver(fpdic, fpprob);
 	
     fclose(fpdic);
 	fclose(fpprob);

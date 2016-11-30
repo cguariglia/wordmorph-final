@@ -55,6 +55,8 @@ Item getData(node *cur) {
  * compFunc must return < 0 if the first item is smaller than the next, = 0 if it's the same and > 0 if it's bigger */
 node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2)) {
 	node *aux, *new_node, *new_first;
+    
+    new_first = first;
 	
 	for(aux = first; aux != NULL; aux = aux->next) {
 		if(compFunc(item, aux->next->data) > 0) {
@@ -63,8 +65,6 @@ node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Ite
             
 			if(aux == first)
 				new_first = new_node;
-			else
-				new_first = first;
 		}
 	}
 

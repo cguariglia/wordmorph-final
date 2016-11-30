@@ -69,9 +69,6 @@ int binarySearch(char *array[], int size, char *value) {
 }
 
 
-
-
-
 /* Returns how many different letters there are in different words */
 int calculateDifferentLetters(char *word1, char *word2) {
     int i, different_letters = 0;

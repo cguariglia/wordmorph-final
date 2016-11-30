@@ -25,13 +25,28 @@ void problemCounter(FILE *prob, int *problem_array) {
 	return;	
 }
 
+void wordCounter(FILE *input, int *occurrences, int *problems) {
+	int i;
+	char word[MAX_STRING];
+	
+	for(i = 0; i < MAX_STRING; i++)
+		occurrences[i] = 0;
+	
+	while(fscanf(input, "%s", word) == 1) {
+		if(problems[strlen(word)] > 0) /*If the problem file involves a word of that size */
+			occurrences[strlen(word)] += 1; 
+	}
+		
+	return;
+}
+
 /* Copies word from file to 3D matrix and sorts individual arrays */
 void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	char word[MAX_STRING];
 	int index, i, length;
 
 	int aux_array[MAX_STRING];
-	
+    
 	/* Allocates each segment of the array depending on how many words of that length there are.*/
 	for(i = 0; i < MAX_STRING; i++) {
 		if(size_array[i] != 0) {
@@ -39,6 +54,8 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 			aux_array[i] = size_array[i];
 		}
 	}
+    
+    rewind(input);
 	
 	while(fscanf(input, "%s", word) == 1) {
 		length = strlen(word);
@@ -54,26 +71,11 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	}
 	
     /* Sorts each array of the matrix */
-	for(i = 0; i < MAX_STRING; i++) {
+	/*for(i = 0; i < MAX_STRING; i++) {
 		if(size_array[i] != 0) {
 			quickSort(output[i], 0, size_array[i] - 1);
 		}
-	}
-		
-	return;
-}
-
-void wordCounter(FILE *input, int *occurrences, int *problems) {
-	int i;
-	char word[MAX_STRING];
-	
-	for(i = 0; i < MAX_STRING; i++)
-		occurrences[i] = 0;
-	
-	while(fscanf(input, "%s", word) == 1) {
-		if(problems[strlen(word)] == 1) /*If the problem file involves a word of that size */
-			occurrences[strlen(word)] += 1; 
-	}
+	}*/
 		
 	return;
 }
@@ -87,12 +89,15 @@ void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *t
 	return;
 }
 
-int compWeight(g_data item1, g_data item2) {
-    if(item1.weight > item2.weight)
+int compWeight(Item i1, Item i2) {
+    g_data *item1 = i1;
+    g_data *item2 = i2;
+    
+    if(item1->weight > item2->weight)
         return 1;
-    else if(item1.weight == item2.weight)
+    else if(item1->weight == item2->weight)
         return 0;
-    else if(item1.weight < item2.weight)
+    else if(item1->weight < item2->weight)
         return -1;
         
     return 0;
@@ -100,10 +105,9 @@ int compWeight(g_data item1, g_data item2) {
 
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
     int i, j, n, word_weight;
-    g_data insert_data;
+    g_data _insert_data = {0, 0};
+    g_data *insert_data = &_insert_data;
     node **aux_list;
-
-    all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
     
     for(i = 0; i < MAX_STRING; i++) {
         if(max_change > 0) {
@@ -113,9 +117,9 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
             for(j = 0; j < size_array[i]; j++) {
                 for(n = 0; n < size_array[i]; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n]);
+                    insert_data->weight = word_weight;
+                    insert_data->vertex = n;
                     if(word_weight > 0 && word_weight < max_change[i]) {
-                        insert_data.weight = word_weight;
-                        insert_data.vertex = n; 
                         aux_list[j] = insertSortedList(aux_list[j], insert_data, compWeight);
                         
                     }
@@ -127,12 +131,32 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
     return;
 }
 
+void freeAllGraphs(graph **all_graphs, int *size_array) {
+    int i;
+    
+    for(i = 0; i < MAX_STRING; i++) {
+        free(all_graphs[i]);
+    }
+        
+    free(all_graphs);
+    
+    return;
+}
+
 /* Second read of the problems file, in which the problems are actually solved and written to the output file.
  * Basically the main function of the whole program. */
- 
 void problemSolver(FILE *dic, FILE *prob) {
     char aux1[MAX_STRING], aux2[MAX_STRING];
-	int max_change;
+    char **dict[MAX_STRING];
+	int changed_letters[MAX_STRING], word_count[MAX_STRING];
+    int max_change;
+    graph **all_graphs;
+    
+    initDictionary(prob, dic, dict, changed_letters, word_count);
+    
+    all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
+    initGraphs(all_graphs, changed_letters, word_count, dict);
+    
     
     while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
         
