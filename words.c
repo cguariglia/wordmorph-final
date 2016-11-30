@@ -63,27 +63,63 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	return;
 }
 
+void wordCounter(FILE *input, int *occurrences, int *problems) {
+	int i;
+	char word[MAX_STRING];
+	
+	for(i = 0; i < MAX_STRING; i++)
+		occurrences[i] = 0;
+	
+	while(fscanf(input, "%s", word) == 1) {
+		if(problems[strlen(word)] == 1) /*If the problem file involves a word of that size */
+			occurrences[strlen(word)] += 1; 
+	}
+		
+	return;
+}
+
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count) {
 	
 	problemCounter(prob, to_solve);
 	wordCounter(dic, word_count, to_solve);
 	wordReader(dic, dictionary, word_count);
-    /* Graph functions go here too, probs */
-	
+    
 	return;
 }
 
-void initGraphs(graph *all_graphs, int *max_change, int *size_array, char ***dict) {
-    int i, j;
+int compWeight(g_data item1, g_data item2) {
+    if(item1.weight > item2.weight)
+        return 1;
+    else if(item1.weight == item2.weight)
+        return 0;
+    else if(item1.weight < item2.weight)
+        return -1;
+        
+    return 0;
+}
+
+void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
+    int i, j, n, word_weight;
+    g_data insert_data;
+    node **aux_list;
+
+    all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
     
     for(i = 0; i < MAX_STRING; i++) {
         if(max_change > 0) {
             all_graphs[i] = graphInit(size_array[i]);
-            for(j = 0; j < to_solve[i]; j++) {
-                for(n = 0; n < to_solve[i]; n++)
-                    if(calculateDifferentLetters(dict[i][n]) > 0 && calculateDifferentLetters(dict[i][n]) < max_change[i])
-                        all_graphs[i][j] = insertSortedList(all_graphs[i][j], 
+            aux_list = graphGetAdj(all_graphs[i]);
             
+            for(j = 0; j < size_array[i]; j++) {
+                for(n = 0; n < size_array[i]; n++) {
+                    word_weight = calculateDifferentLetters(dict[i][j], dict[i][n]);
+                    if(word_weight > 0 && word_weight < max_change[i]) {
+                        insert_data.weight = word_weight;
+                        insert_data.vertex = n; 
+                        aux_list[j] = insertSortedList(aux_list[j], insert_data, compWeight);
+                        
+                    }
+                }
             }
         }
     }
@@ -93,6 +129,7 @@ void initGraphs(graph *all_graphs, int *max_change, int *size_array, char ***dic
 
 /* Second read of the problems file, in which the problems are actually solved and written to the output file.
  * Basically the main function of the whole program. */
+ 
 void problemSolver(FILE *dic, FILE *prob) {
     char aux1[MAX_STRING], aux2[MAX_STRING];
 	int max_change;

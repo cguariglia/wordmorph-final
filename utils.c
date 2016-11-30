@@ -70,68 +70,6 @@ int binarySearch(char *array[], int size, char *value) {
 
 
 
-int partition(char *array[], int left, int right) {
-	int i, j;
-	char *pivot, *aux;
-	
-	i = left - 1;
-	j = right;
-	pivot = array[right];
-	
-	while(1) {
-		while(strcmp(array[++i], pivot) < 0);
-		while(strcmp(pivot, array[--j]) < 0)
-			if(j == left)
-				break;
-		
-		if(i >= j)
-			break;
-			
-		aux = array[i];
-		array[i] = array[j];
-		array[j] = aux;
-	}
-	
-	aux = array[i];
-	array[i] = array[right];
-	array[right] = aux;
-	
-	return i;
-}
-
-
-/* Quick sort */
-void quickSort(char *array[], int left, int right) {
-	stack *s;
-	int i;
-	
-	s = initStack();
-	push(&s, left);
-	push(&s, right);
-	while(isEmpty(s) == 0) {
-		right = pop(&s);
-		left = pop(&s);
-		if(right <= left)
-			continue;
-			
-		i = partition(array, left, right);
-		if(i - left > right - i) {
-			push(&s, left);
-			push(&s, i - 1);
-			push(&s, i + 1);
-			push(&s, right);	
-		} 
-		else {
-			push(&s, i + 1);
-			push(&s, right);
-			push(&s, left);
-			push(&s, i - 1);
-		}
-	}
-	
-	clearStack(s);
-}
-
 
 
 /* Returns how many different letters there are in different words */
@@ -145,10 +83,10 @@ int calculateDifferentLetters(char *word1, char *word2) {
     return different_letters;
 }
 
-void freeMatrix(char ***mat, int *size) {
+void freeMatrix(char ***mat, int *size, int init_size) {
 	int i, j;
 	
-	for(i = 0; i < MAX_STRING; i++) {
+	for(i = 0; i < init_size; i++) {
 		for(j = 0; j < size[i]; j++) {
 			free(mat[i][j]);
 		}

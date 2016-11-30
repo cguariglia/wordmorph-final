@@ -105,6 +105,13 @@ graph * graphInit(int vert_num) {
     return g;
 }
 
+int graphGetVert(graph *g) {
+    return g->vertices;
+}
+
+node ** graphGetAdj(graph *g) {
+    return g->adj;
+}
 
 void insertVertex(graph *g, int index, Item data) {
 	g->adj[index] = newNode(data, NULL);
@@ -143,13 +150,13 @@ int queueIsEmpty(queue *q) {
     return q->first == 0;
 }
 
-void insertInHeap(queue *q, Item data) {
+void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
     int next;
     next = q->first + 1;
     
     if(next < q->size) {
         q->data[next] = data;
-        fixUp(q, q->first);
+        fixUp(q, q->first, compItem);
         q->first = next;
     }
     else /* If somenody tries to insert something in an already full queue */
@@ -158,7 +165,7 @@ void insertInHeap(queue *q, Item data) {
     return;
 }
 
-void fixUp(queue *q, int idx) {
+void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
 	
 	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {		
@@ -166,14 +173,14 @@ void fixUp(queue *q, int idx) {
         q->data[idx] = q->data[(idx-1)/2];
         q->data[(idx-1)/2] = aux;
         
-        idx = (idx-1)/2;
+        idx = (idx - 1) / 2;
 	}
     
     return;
 }
 
 
-void fixDown(queue *q, int idx, int n) {
+void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     int child;
 	
@@ -205,30 +212,4 @@ Item removeHeap(queue *q) {
 	aux = q->data[0];
 
 	return aux;
-}
-
-void Dijkstra(graph *g, int s, int *st, double *wt) {
-	int v, w;
-    queue *q;
-	node *t;
-	
-	q = queueInit(1000); /* TODO: definir tamanho máximo do heap */
-	
-	for(v = 0; v < g->vertices; v++) {
-		st[v] = -1;
-		wt[v] = MAX_WT;
-		insertInHeap(q, v);
-	}
-		
-	wt[s] = 0.0;
-	fixDown(s); /* altera a posicao do elemento por ter baixado prioridade */
-	while(!queueIsEmpty)
-		if(wt[v = RemoveHeap] != MAX_WT)
-			for(t= g->adj[v]; t!= NULL; t=t->next)
-				if(wt[w=t->this1] > (wt[v] + t->wt)){
-					
-					wt[w]= (wt[v] + t->wt) ;
-					DecHeap(w);
-					st[w]=v;
-				}
 }
