@@ -14,7 +14,7 @@ typedef struct queue queue;
 typedef struct {
     int vertex; 
     int weight;
-} g_data;
+} g_data ;
 
 typedef void * Item;
 

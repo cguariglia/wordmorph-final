@@ -56,18 +56,27 @@ Item getData(node *cur) {
 node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2)) {
 	node *aux, *new_node, *new_first;
     
-    new_first = first;
+   /* new_first = first;*/
+
+
+	new_node = newNode(item, first);
+
+	new_first=new_node;
 	
+	
+	/*
 	for(aux = first; aux != NULL; aux = aux->next) {
-		if(compFunc(item, aux->next->data) > 0) {
+			if(compFunc(item, aux->next->data) > 0) {
 			new_node = newNode(item, aux->next);
 			aux->next = new_node;
             
 			if(aux == first)
 				new_first = new_node;
 		}
+		
 	}
 
+		*/
 	return new_first;
 }
 
@@ -132,15 +141,18 @@ void freeGraph(graph *g, void (* freeItem)(Item)) {
     return;
 }
 
+
 /* Heap definitions: */
 
 queue * queueInit(int size) {
     queue *q;
     
-    q = (queue *)malloc(size * sizeof(Item));
+    q = (queue *)malloc(size * sizeof(queue));
     if(q == NULL)
         exit(0);
-    q->size = size;
+           
+    q->data=(Item *)malloc(size * sizeof(Item));   
+    q->size = 0;
     q->first = 0;
     
     return q;
@@ -204,12 +216,18 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
 }
 
 
+
+
 /* retira o elemento de mais baixa prioridade*/
 Item removeHeap(queue *q) {
 	Item aux;
 	
-	--(q->first);	
-	aux = q->data[0];
+/*	--(q->first);	
+	aux = q->data[0];*/
+		
+	aux = q->data[q->first];
+	++(q->first);	
+	--(q->size);	
 
-	return aux;
+	return aux.vertex;
 }

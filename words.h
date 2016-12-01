@@ -19,4 +19,7 @@ void wordCounter(FILE *input, int *occurrences, int *problems);
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count);
 void problemSolver(FILE *dic, FILE *prob);
 
+void dijkstra(graph *g, int s, int *st, int *wt);
+
+void freeAllGraphs(graph **all_graphs/*, int *size_array*/);
 #endif
