@@ -165,15 +165,15 @@ Item *emptyHeap(queue *q) {
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
     int next;
-    next = q->first + 1;
+    next = q->size;
     
-    if(next < q->size) {
+  /*  if(next < q->size) {*/
         q->data[next] = data;
         fixUp(q, q->first, compItem);
         q->first = next;
-    }
-    else /* If somenody tries to insert something in an already full queue */
-        exit(0);
+    /*}*/
+   /* /*else  If somenody tries to insert something in an already full queue */
+       /* exit(0);*/
         
     return;
 }
