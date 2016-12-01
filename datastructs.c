@@ -158,8 +158,9 @@ queue * queueInit(int size) {
     return q;
 }
 
-int queueIsEmpty(queue *q) {
-    return q->first == 0;
+
+Item *emptyHeap(queue *q) {	
+    if (q->size == 0) return NULL;
 }
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {

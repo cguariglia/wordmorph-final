@@ -122,12 +122,15 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     insert_data->vertex = n;
                     if(word_weight > 0 && word_weight <= max_change[i]) {
                         aux_list[j] = insertSortedList(aux_list[j], insert_data, compWeight);
-
+						
                     }
                 }
             }
         }
+    
     }
+    
+    
     
     return;
 }
@@ -160,7 +163,8 @@ void problemSolver(FILE *dic, FILE *prob) {
     if (all_graphs == NULL) exit(0);
    
     initGraphs(all_graphs, changed_letters, word_count, dict);
-    
+   
+
 	freeAllGraphs(all_graphs);
     
     /*
@@ -170,6 +174,30 @@ void problemSolver(FILE *dic, FILE *prob) {
     
     return;
 }
+
+/*
+
+void solveAllProblems(graph **all_graphs)
+{
+	int i;
+	
+	for(i = 0; i < MAX_STRING; i++) { /* Para cada problema */ 
+	
+	
+/*	
+	} 
+}
+*/
+
+
+void solveProblem(graph *g, ) /*Resolver para 1 palavra - ou seja para so 1 linha do ficheiro de problemas */
+{
+	
+	
+	
+	
+	
+} 
 
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
