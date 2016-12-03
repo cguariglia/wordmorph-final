@@ -69,13 +69,6 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 			aux_array[length] -= 1;
 		}
 	}
-	
-    /* Sorts each array of the matrix */
-	/*for(i = 0; i < MAX_STRING; i++) {
-		if(size_array[i] != 0) {
-			quickSort(output[i], 0, size_array[i] - 1);
-		}
-	}*/
 		
 	return;
 }
@@ -116,21 +109,19 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
      
             
             for(j = 0; j < size_array[i]; j++) {
-                for(n = 0; n < size_array[i]; n++) {
+                for(n = 0; n < j; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n]);
                     insert_data->weight = word_weight;
-                    insert_data->vertex = n;
                     if(word_weight > 0 && word_weight <= max_change[i]) {
+                        insert_data->vertex = n;
                         aux_list[j] = insertSortedList(aux_list[j], insert_data, compWeight);
-						
+                        insert_data->vertex = j;
+                        aux_list[n] = insertSortedList(aux_list[n], insert_data, compWeight);
                     }
                 }
             }
         }
-    
     }
-    
-    
     
     return;
 }
@@ -138,9 +129,8 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
 void freeAllGraphs(graph **all_graphs/*, int *size_array*/) {
     int i;
     
-    for(i = 0; i < MAX_STRING; i++) {
+    for(i = 0; i < MAX_STRING; i++)
         free(all_graphs[i]);
-    }
         
     free(all_graphs);
     
@@ -158,89 +148,47 @@ void problemSolver(FILE *dic, FILE *prob) {
 
     initDictionary(prob, dic, dict, changed_letters, word_count);
     
-    
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
-    if (all_graphs == NULL) exit(0);
-   
     initGraphs(all_graphs, changed_letters, word_count, dict);
-   
-
-	freeAllGraphs(all_graphs);
     
-    /*
     while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
         
-    }*/
+    }
+    
+    freeAllGraphs(all_graphs);
+    freeMatrix(dict, word_count, MAX_STRING);
     
     return;
 }
 
-/*
+void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v,char **dic[MAX_STRING], int cost) {
+	int aux;
+	
+	aux = st[final_v]; 
 
-void solveAllProblems(graph **all_graphs)
-{
-	int i;
+	/*Calculate cost_morph, if cost_morph>cost cost=-1 */
+	if(cost_m > cost)
+        cost_m = -1;
 	
-	for(i = 0; i < MAX_STRING; i++) { /* Para cada problema */ 
+	writefirstOutput(output, dictionary[w_size][origin_v], cost_m);
 	
-	
-/*	
-	} 
-}
-*/
-
-
-void solveProblem(graph *g, ) /*Resolver para 1 palavra - ou seja para so 1 linha do ficheiro de problemas */
-{
-	
-	
-	
-	
-	
-} 
-
-
-void dijkstra(graph *g, int s, int *st, int *wt) {
-	int  w, i;
-	Item v;
-    queue *q;
-	node *t;
-	
-	
-	q = queueInit(1000); /* TODO: definir tamanho máximo do heap */
-
-	for(v.vertex = (g->vertices)-1; v.vertex >=0; v.vertex--) {
-		
-		st[v.vertex] = -1;		
-		wt[v.vertex] = MAX_WT;
-		v.weight=MAX_WT;	
-		insertInHeap(q,v);	
+	/*Retrace path to origin vertice*/
+	while((aux!=origin_v) && (cost_m != -1)) {
+        aux = st[aux];
+	 
+	    /*Print word correspondent to vertex aux*/
+	    writeOutput(output, dic[w_size][aux]);
 	}
-		
-	wt[s] = 0;
-	
-	q->data[g->vertices -1 -s].weight=0; /* Coloca a pos correspondente ao vertice s com peso a 0*/
-	fixUp(q, g->vertices -1 -s); /* altera a posicao do elemento por ter baixado prioridade for(v.vertex = 0; v.vertex < (g->vertices); v.vertex++)*/
- 
+    
+	writeOutput(output, dic[w_size][aux]);
+	fprintf(output, "\n"); 
 
-	while(emptyHeap(q)!=NULL){ 
-		if(wt[v.vertex = removeHeap(q)] != MAX_WT){
-			for(t = g->adj[v.vertex]; t!= NULL; t=t->next){
-
-				if(wt[w=t->data.vertex] > (wt[v.vertex] + t->data.weight)){
-
-					wt[w]= (wt[v.vertex] + t->data.weight) ;
-					q->data[g->vertices -1 -w].weight=wt[w];
-					
-					fixUp(q,g->vertices -1 -w);
-					st[w]=v.vertex;
-				}
-			}
-		}
-	}		
-	for(i=0; i < g->vertices;i++) printf("\n O vetor st:%d", st[i]); /* Confirmar spt*/
-	for(i=0; i < g->vertices;i++) printf("\n \tO vetor WT:%d", wt[i]); /* Confirmar spt*/
+    return;
 }
 
-
-
+void solveProblem(graph *g, char *word1, char *word2) {
+    int weight_vertex[;
+    
+    dijkstra(g, int s, int *st, int *wt);
+    
+}

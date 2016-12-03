@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
 #include "datastructs.h"
 
 #define MAX_STRING 100
@@ -21,5 +20,6 @@ void problemSolver(FILE *dic, FILE *prob);
 
 void dijkstra(graph *g, int s, int *st, int *wt);
 
-void freeAllGraphs(graph **all_graphs/*, int *size_array*/);
+void freeAllGraphs(graph **all_graphs, int *size_array);
+
 #endif

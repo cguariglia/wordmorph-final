@@ -14,7 +14,7 @@ typedef struct queue queue;
 typedef struct {
     int vertex; 
     int weight;
-} g_data ;
+} g_data;
 
 typedef void * Item;
 
@@ -29,15 +29,18 @@ graph * graphInit(int vert_num);
 int graphGetVert(graph *g);
 node ** graphGetAdj(graph *g);
 void insertVertex(graph *g, int index, Item data);
+void printGraph(graph *g);
 void freeGraph(graph *g, void (* freeItem)(Item));
 
 queue * queueInit(int size);
 int queueIsEmpty(queue *q);
-void insertInQueue(queue *q, Item data);
+Item * queueGetData(queue *q);
+void changeQueueData(queue **q, int idx, Item new_value);
+void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2));
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2));
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2));
-Item *emptyHeap(queue *q);
+int emptyHeap(queue *q);
 Item removeHeap();
-void Dijkstra(graph *g, int s, int *st, double *wt);
+void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2));
 
 #endif

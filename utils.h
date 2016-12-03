@@ -2,7 +2,6 @@
 #define UTILS_H
 
 #include <stdio.h>
-#include "stack.h"
 
 #define MAX_STRING 100
 

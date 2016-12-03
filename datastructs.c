@@ -28,6 +28,7 @@ node * initLinkedList() {
     return NULL;
 }
 
+/* Given data and the next node, makes a new node */
 node * newNode(Item data, node *next) {
     node *new;
     
@@ -40,10 +41,18 @@ node * newNode(Item data, node *next) {
     return new;
 }
 
+/* Returns a node because it's easier than passing a double pointer. */
+node * changeNodeData(node *old, Item new_data) {
+    old->data = new_data;
+    return old;
+}
+
+/* Returns the node following cur */
 node * nextNode(node *cur) {
     return ((cur == NULL) ? NULL : cur->next);
 }
 
+/* Returns cur's data */
 Item getData(node *cur) {
     if(cur == NULL)
         exit(0);
@@ -56,17 +65,11 @@ Item getData(node *cur) {
 node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2)) {
 	node *aux, *new_node, *new_first;
     
-   /* new_first = first;*/
-
-
+    new_first = first;
 	new_node = newNode(item, first);
 
-	new_first=new_node;
-	
-	
-	/*
 	for(aux = first; aux != NULL; aux = aux->next) {
-			if(compFunc(item, aux->next->data) > 0) {
+        if(compFunc(item, aux->next->data) > 0) {
 			new_node = newNode(item, aux->next);
 			aux->next = new_node;
             
@@ -75,11 +78,11 @@ node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Ite
 		}
 		
 	}
-
-		*/
+    
 	return new_first;
 }
 
+/* Iterates through the linked list, freeing every node in the meantime */
 void freeLinkedList(node *head, void (* freeItem)(Item)) {
     node *next, *aux;
     
@@ -94,6 +97,7 @@ void freeLinkedList(node *head, void (* freeItem)(Item)) {
 
 /* Graph (using adjacency lists) definitions: */
 
+/* Initializes graph, given the number of vertices on it. The graph starts with no edges, obviously. */
 graph * graphInit(int vert_num) {
     graph *g;
     int i;
@@ -129,6 +133,7 @@ void insertVertex(graph *g, int index, Item data) {
     return;
 }
 
+/* Frees the graph (including it's adjacency list */
 void freeGraph(graph *g, void (* freeItem)(Item)) {
     int i;
     
@@ -144,6 +149,7 @@ void freeGraph(graph *g, void (* freeItem)(Item)) {
 
 /* Heap definitions: */
 
+/* Initializes a queue given its size */
 queue * queueInit(int size) {
     queue *q;
     
@@ -151,29 +157,42 @@ queue * queueInit(int size) {
     if(q == NULL)
         exit(0);
            
-    q->data=(Item *)malloc(size * sizeof(Item));   
+    q->data=(Item *)malloc(size * sizeof(Item)); 
+    if(q->data == NULL)
+        exit(0);
+         
     q->size = 0;
     q->first = 0;
     
     return q;
 }
 
+Item * queueGetData(queue *q) {
+    return q->data;
+}
 
-Item *emptyHeap(queue *q) {	
-    if (q->size == 0) return NULL;
+/* Gives the user an opportunity to change the queue data */
+void changeQueueData(queue **q, int idx, Item new_value) {
+    (*q)->data[idx] = new_value;
+    return;
+}
+
+/* Checks if the heap is empty or not */
+int emptyHeap(queue *q) {	
+    return (q->size == 0);
 }
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
     int next;
-    next = q->size;
+    next = q->first + 1;
     
-  /*  if(next < q->size) {*/
+    if(next < q->size) {
         q->data[next] = data;
         fixUp(q, q->first, compItem);
         q->first = next;
-    /*}*/
-   /* /*else  If somenody tries to insert something in an already full queue */
-       /* exit(0);*/
+    }
+    else /* If somenody tries to insert something in an already full queue */
+        exit(0);
         
     return;
 }
@@ -184,7 +203,7 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {		
         aux = q->data[idx];
         q->data[idx] = q->data[(idx-1)/2];
-        q->data[(idx-1)/2] = aux;
+        q->data[(idx - 1)/2] = aux;
         
         idx = (idx - 1) / 2;
 	}
@@ -200,7 +219,7 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
 	while (2 * idx < n - 1){
 		child = 2 * idx + 1;
 		
-		if(child < (n - 1) && compItem(q->data[child], q->data[child+1]) > 0)
+		if(child < (n - 1) && compItem(q->data[child], q->data[child + 1]) > 0)
             child++;
 		
 		if(compItem(q->data[idx], q->data[child]) < 0)
@@ -216,19 +235,20 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
     return;
 }
 
-
-
-
-/* retira o elemento de mais baixa prioridade*/
 Item removeHeap(queue *q) {
 	Item aux;
-	
-/*	--(q->first);	
-	aux = q->data[0];*/
 		
 	aux = q->data[q->first];
 	++(q->first);	
 	--(q->size);	
 
-	return aux.vertex;
+	return aux;
+}
+
+/* This is a terrible function name.
+ * It lowers something's priority and then fixes the heap afterwards. */
+void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2)) {
+    lowerPriority(q, idx, n_p);
+    fixUp(q, idx, compItem);
+    return;
 }

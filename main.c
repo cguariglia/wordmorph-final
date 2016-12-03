@@ -18,14 +18,10 @@ int main(int argc, char **argv) {
 	fpdic = fcheck(argv[1], ".dic");
 	fpprob = fcheck(argv[2], ".pal");
   
-
     problemSolver(fpdic, fpprob);
 	
     fclose(fpdic);
 	fclose(fpprob);
- 
-
-    
  
 	return 0;
 }
