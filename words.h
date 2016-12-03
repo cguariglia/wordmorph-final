@@ -12,15 +12,15 @@ void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *t
 int compWeight(Item item1, Item item2);
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict);
 int compWeight(Item item1, Item item2);
-void problemSolver(FILE *dic, FILE *prob);
+
 void wordReader(FILE *input, char **output[MAX_STRING], int *size_array);
 void wordCounter(FILE *input, int *occurrences, int *problems);
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count);
-void problemSolver(FILE *dic, FILE *prob);
 
+void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v, char **dic[MAX_STRING], int cost);
+void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array);
+void problemSolver(FILE *dic, FILE *prob, FILE *path);
 
-void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING]);
-
-void freeAllGraphs(graph **all_graphs, int *size_array);
+void freeAllGraphs(graph **all_graphs);
 
 #endif

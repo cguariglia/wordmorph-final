@@ -13,6 +13,8 @@ int binarySearch(char *array[], int size, char *value);
 
 void writefirstOutput(FILE * fp, char * word, int cost);
 void writeOutput(FILE * fp, char * word);
+int compWeight(Item item1, Item item2);
+
 void dijkstra(graph *g, int s, int *st, int *wt);
 void lowerWeight(queue *q, int idx, Item new_weight);
 int compInts(Item i1, Item i2);

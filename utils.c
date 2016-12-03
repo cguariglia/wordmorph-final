@@ -83,6 +83,20 @@ int compInts(Item i1, Item i2) {
     return 0;
 }
 
+int compWeight(Item i1, Item i2) {
+    g_data *item1 = i1;
+    g_data *item2 = i2;
+
+    if(item1->weight > item2->weight)
+        return 1;
+    else if(item1->weight == item2->weight)
+        return 0;
+    else if(item1->weight < item2->weight)
+        return -1;
+        
+    return 0;
+}
+
 void lowerWeight(queue *q, int idx, Item new_weight) {
     g_data _data = {0, 0};
     g_data *data = &_data;
@@ -94,52 +108,56 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
 void writefirstOutput(FILE * fp, char * word, int cost) { 
 	
     fprintf(fp, "\n%s %d\n", word, cost); /* Write origin word and cost*/
+    printf("\n%s %d\n", word, cost);
 
     return;
 }
 
 void writeOutput(FILE * fp, char * word) { 
     
-    fprintf(fp, "%s\n", word); 
+    fprintf(fp, "%s\n", word);
+    printf("%s\n", word); 
 
     return;
 }
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
-	int *help_w;
-    int w, verts;
-    g_data _v = {0, 0};
-	g_data *v, *aux;
+	g_data *help_w;
+    int w, verts, aux_w;
+    g_data _v = {0, 0}, _max_wt = {MAX_WT, MAX_WT};
+	g_data *v, *aux, *max_wt;
     queue *q;
     node **aux_adj;
 	node *t;
     
+    max_wt = &_v;
     v = &_v;
     verts = graphGetVert(g);
-	q = queueInit(verts);
+	q = queueInit(verts + 1);
 
-	for(v->vertex = verts - 1; v->vertex >= 0; v->vertex--) {
-		st[v->vertex] = -1;		
+	for(v->vertex = 0; v->vertex < verts; v->vertex++) {
+        st[v->vertex] = -1;
 		wt[v->vertex] = MAX_WT;
 		v->weight = MAX_WT;	
-		insertInHeap(q, v, compInts);	
+		insertInHeap(q, v, compWeight);
 	}
-		
+    
 	wt[s] = 0;
-	
-    fixLowerPriority(q, verts - 1 - s, 0, lowerWeight, compInts);
- 
+	fixLowerPriority(q, verts - 1 - s, 0, lowerWeight, compInts);
+    
+    max_wt = &_max_wt;
 	while(!emptyHeap(q)) {
-        help_w = removeHeap(q);
-        v->vertex = *help_w;
-        
+        help_w = (g_data *)removeHeap(q, max_wt, lowerWeight, compInts);
+        printf("dijkstra 3\n");
+        aux_w = help_w->vertex;
+        printf("aux_w: %d \n", aux_w);
 		if(wt[v->vertex] != MAX_WT){
             aux_adj = graphGetAdj(g);
-            
+            printf("dijkstra 4\n");
 			for(t = aux_adj[v->vertex]; t != NULL; t = nextNode(t)) {
                 aux = getData(t);
                 w = aux->vertex;
-                
+                printf("dijkstra 5\n");
 				if(wt[w] > (wt[v->vertex] + aux->weight)) {
 					wt[w] = (wt[v->vertex] + aux->weight);
                     fixLowerPriority(q, verts - 1 - w, &wt[w], lowerWeight, compInts);

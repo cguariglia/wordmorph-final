@@ -12,8 +12,8 @@ typedef struct edge edge;
 typedef struct queue queue;
 
 typedef struct {
-    int vertex; 
     int weight;
+    int vertex; 
 } g_data;
 
 typedef void * Item;
@@ -40,7 +40,7 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2));
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2));
 int emptyHeap(queue *q);
-Item removeHeap();
 void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2));
+Item removeHeap(queue *q, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2));
 
 #endif

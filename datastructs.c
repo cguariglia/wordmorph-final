@@ -18,7 +18,7 @@ struct graph {
 
 struct queue {
     int size;
-    int first;
+    int first; /* as in first empty spot in the queue */
     Item *data;
 };
 
@@ -95,6 +95,8 @@ void freeLinkedList(node *head, void (* freeItem)(Item)) {
     return;
 }
 
+
+
 /* Graph (using adjacency lists) definitions: */
 
 /* Initializes graph, given the number of vertices on it. The graph starts with no edges, obviously. */
@@ -161,7 +163,7 @@ queue * queueInit(int size) {
     if(q->data == NULL)
         exit(0);
          
-    q->size = 0;
+    q->size = size;
     q->first = 0;
     
     return q;
@@ -183,13 +185,10 @@ int emptyHeap(queue *q) {
 }
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
-    int next;
-    next = q->first + 1;
-    
-    if(next < q->size) {
-        q->data[next] = data;
+    if(q->first + 1 < q->size) {
+        q->data[q->first] = data;
         fixUp(q, q->first, compItem);
-        q->first = next;
+        q->first += 1;
     }
     else /* If somenody tries to insert something in an already full queue */
         exit(0);
@@ -199,12 +198,11 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
 
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
-	
-	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {		
+    
+	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {
         aux = q->data[idx];
         q->data[idx] = q->data[(idx-1)/2];
         q->data[(idx - 1)/2] = aux;
-        
         idx = (idx - 1) / 2;
 	}
     
@@ -235,22 +233,23 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
     return;
 }
 
-Item removeHeap(queue *q) {
-	Item aux;
-		
-	aux = q->data[q->first];
-	++(q->first);	
-	--(q->size);	
-
-	return aux;
-}
-
 /* This is a terrible function name.
  * It lowers something's priority and then fixes the heap afterwards. */
 void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2)) {
     lowerPriority(q, idx, n_p);
     fixUp(q, idx, compItem);
     return;
+}
+
+Item removeHeap(queue *q, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2)) {
+	Item aux;
+    
+    fixLowerPriority(q, 0, n_p, lowerPriority, compItem);
+    
+	aux = q->data[q->first];
+	--(q->first);
+
+	return aux;
 }
 
 void freeHeap() {
