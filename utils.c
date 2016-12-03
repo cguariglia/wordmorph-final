@@ -106,12 +106,16 @@ void writeOutput(FILE * fp, char * word) {
 }
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
-	int w, verts;
+	int *help_w;
+    int w, verts;
+    g_data _v = {0, 0};
 	g_data *v, *aux;
     queue *q;
     node **aux_adj;
 	node *t;
-	
+    
+    v = &_v;
+    verts = graphGetVert(g);
 	q = queueInit(verts);
 
 	for(v->vertex = verts - 1; v->vertex >= 0; v->vertex--) {
@@ -126,7 +130,8 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
     fixLowerPriority(q, verts - 1 - s, 0, lowerWeight, compInts);
  
 	while(!emptyHeap(q)) {
-        v->vertex = removeHeap(q); 
+        help_w = removeHeap(q);
+        v->vertex = *help_w;
         
 		if(wt[v->vertex] != MAX_WT){
             aux_adj = graphGetAdj(g);
@@ -137,7 +142,7 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
                 
 				if(wt[w] > (wt[v->vertex] + aux->weight)) {
 					wt[w] = (wt[v->vertex] + aux->weight);
-                    fixLowerPriority(q, verts - 1 - w, wt[w], lowerWeight, compInts);
+                    fixLowerPriority(q, verts - 1 - w, &wt[w], lowerWeight, compInts);
 					st[w] = v->vertex;
 				}
 			}
