@@ -252,3 +252,7 @@ void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue 
     fixUp(q, idx, compItem);
     return;
 }
+
+void freeHeap() {
+    
+}

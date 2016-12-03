@@ -90,6 +90,21 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
     return;
 }
 
+/*Write the first line for each problem in the solution file */
+void writefirstOutput(FILE * fp, char * word, int cost) { 
+	
+    fprintf(fp, "\n%s %d\n", word, cost); /* Write origin word and cost*/
+
+    return;
+}
+
+void writeOutput(FILE * fp, char * word) { 
+    
+    fprintf(fp, "%s\n", word); 
+
+    return;
+}
+
 void dijkstra(graph *g, int s, int *st, int *wt) {
 	int w, verts;
 	g_data *v, *aux;
@@ -97,9 +112,7 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
     node **aux_adj;
 	node *t;
 	
-    verts = graphGetVert(g);
-    
-	q = queueInit(1000); 
+	q = queueInit(verts);
 
 	for(v->vertex = verts - 1; v->vertex >= 0; v->vertex--) {
 		st[v->vertex] = -1;		
@@ -114,11 +127,14 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
  
 	while(!emptyHeap(q)) {
         v->vertex = removeHeap(q); 
+        
 		if(wt[v->vertex] != MAX_WT){
             aux_adj = graphGetAdj(g);
+            
 			for(t = aux_adj[v->vertex]; t != NULL; t = nextNode(t)) {
                 aux = getData(t);
                 w = aux->vertex;
+                
 				if(wt[w] > (wt[v->vertex] + aux->weight)) {
 					wt[w] = (wt[v->vertex] + aux->weight);
                     fixLowerPriority(q, verts - 1 - w, wt[w], lowerWeight, compInts);

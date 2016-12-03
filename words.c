@@ -161,7 +161,7 @@ void problemSolver(FILE *dic, FILE *prob) {
     return;
 }
 
-void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v,char **dic[MAX_STRING], int cost) {
+void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v, char **dic[MAX_STRING], int cost) {
 	int aux;
 	
 	aux = st[final_v]; 
@@ -170,7 +170,7 @@ void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int or
 	if(cost_m > cost)
         cost_m = -1;
 	
-	writefirstOutput(output, dictionary[w_size][origin_v], cost_m);
+	writefirstOutput(output, dic[w_size][origin_v], cost_m);
 	
 	/*Retrace path to origin vertice*/
 	while((aux!=origin_v) && (cost_m != -1)) {
@@ -186,9 +186,37 @@ void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int or
     return;
 }
 
-void solveProblem(graph *g, char *word1, char *word2) {
-    int weight_vertex[;
-    
-    dijkstra(g, int s, int *st, int *wt);
-    
+void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array) {
+	char aux1[MAX_STRING], aux2[MAX_STRING];
+	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0;
+    int *wt, *st;
+	
+	
+    /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo*/
+	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho*/
+	/* Imprimir no ficheiro de saida as palavras do caminho com base nos valores no vetor s*/
+
+    /* Para cada problema */ 
+	
+	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
+        length = strlen(aux1);
+        
+        for(i = 0; i < size_array[strlen(aux1)]; i++) {
+            if(strcmp(aux1, dictionary[length][i]) == 0)
+                origin_v = i;
+            else if(strcmp(aux2, dictionary[length][i]) == 0)
+                final_v = i;
+        }
+        
+        verts = graphGetVert(all_graphs[length]);
+        
+        wt = (int *)allocate(verts * sizeof(int));
+        st = (int *)allocate(verts * sizeof(int));
+        
+	    dijkstra(all_graphs[length], origin_v, st, wt);
+      
+        printPath(input, output, length, st, wt[final_v], origin_v, final_v, dictionary, cost);
+        free(wt);
+        free(st);
+    }
 }
