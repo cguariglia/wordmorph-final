@@ -86,7 +86,7 @@ int compInts(Item i1, Item i2) {
 int compWeight(Item i1, Item i2) {
     g_data *item1 = i1;
     g_data *item2 = i2;
-
+    
     if(item1->weight > item2->weight)
         return 1;
     else if(item1->weight == item2->weight)

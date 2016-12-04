@@ -66,18 +66,32 @@ node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Ite
 	node *aux, *new_node, *new_first;
     
     new_first = first;
-	new_node = newNode(item, first);
 
-	for(aux = first; aux != NULL; aux = aux->next) {
-        if(compFunc(item, aux->next->data) > 0) {
-			new_node = newNode(item, aux->next);
-			aux->next = new_node;
+	if(first == NULL) {
+        first = newNode(item, NULL);
+        new_first = first;
+    }
+    else {
+        for(aux = first; aux != NULL; aux = aux->next) {
+            /* If the next node is null, then we can't access aux->next->data.
+             * So we insert the node at the end. */
+            if(aux->next == NULL) {
+                new_node = newNode(item, NULL);
+                aux->next = new_node;
+                
+                /* Sometimes the end is the very first node, though. */
+                if(aux == first)
+                    new_first = new_node;
+                
+                break;
+            }
+            else if(compFunc(item, aux->next->data) > 0) {
+                new_node = newNode(item, aux->next);
+                aux->next = new_node;
+            }
             
-			if(aux == first)
-				new_first = new_node;
-		}
-		
-	}
+        }
+    }
     
 	return new_first;
 }
@@ -245,6 +259,7 @@ Item removeHeap(queue *q, Item n_p, void (* lowerPriority)(queue *q, int idx, It
 	Item aux;
     
     fixLowerPriority(q, 0, n_p, lowerPriority, compItem);
+    printf("hi\n");
     
 	aux = q->data[q->first];
 	--(q->first);

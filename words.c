@@ -123,7 +123,7 @@ void printPath(FILE *input, FILE *output, int w_size, int *st, int cost_m, int o
 	writefirstOutput(output, dic[w_size][origin_v], cost_m);
 	
 	/*Retrace path to origin vertice*/
-	while((aux!=origin_v) && (cost_m != -1)) {
+	while((aux != origin_v) && (cost_m != -1)) {
         aux = st[aux];
 	 
 	    /*Print word correspondent to vertex aux*/
