@@ -48,6 +48,7 @@ Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2));
 int getGraphVertex(Item info);
 int getGraphWeight(Item info);
 Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2));
-
-
+int find_Queuev(queue *q, int original_qsize, int vertex);
+int get_qsize(queue *q);
 #endif
+

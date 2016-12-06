@@ -22,3 +22,4 @@ int calculateDifferentLetters(char *word1, char *word2);
 void freeMatrix(char ***mat, int *size, int init_size);
 
 #endif
+

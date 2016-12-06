@@ -109,7 +109,7 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
 void writefirstOutput(FILE * fp, char * word, int cost) { 
 	
     fprintf(fp, "\n%s %d\n", word, cost); /* Write origin word and cost*/
-    printf("\n%s %d\n", word, cost);
+    /*printf("\n%s %d\n", word, cost);*/
 
     return;
 }
@@ -117,53 +117,66 @@ void writefirstOutput(FILE * fp, char * word, int cost) {
 void writeOutput(FILE * fp, char * word) { 
     
     fprintf(fp, "%s\n", word);
-    printf("%s\n", word);
+    /*printf("%s\n", word); */
 
     return;
 }
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
 	g_data *help_w;
-    int w, vertex, verts, aux_vertex, aux_w, total_weight = 0;
+	g_data **sos;
+    int w,vertex, verts, aux_vertex, aux_w, i=-1;
+    g_data _v = {0, 0}, _max_wt = {MAX_WT, MAX_WT};
+	g_data *v,  *max_wt;
     queue *q;
     node **aux_adj;
 	node *t;
 	g_data * aux;
+	int h_pos;
 
-
-	verts = graphGetVert(g); 
+    /* g_data *insert_data = &_insert_data;
+    max_wt = &_v;*/
+    /*v = &_v;*/
+    verts = graphGetVert(g); 
 	q = queueInit(verts);
 	for(vertex = 0; vertex < verts; (vertex)++) {
 		st[vertex] = -1;
 		wt[vertex] = MAX_WT;
-		insertInHeap(q, newGData(MAX_WT, vertex) , compWeight);  /* O mesmo raciocinio para a heap*/
+					
+		insertInHeap(q, newGData(MAX_WT, vertex) , compWeight); 
 	}
 	
 	
 	wt[s] = 0;
 	changeQueueData(&q, s, newGData(0, s));    /* Mudar o peso do vertice s no vetor da queue*/
 	fixUp(q, s, compInts);
-	/*Soo far soo bueno */
-	
+
 	while(!emptyHeap(q)) {
-        help_w = (g_data *)removeHeap(q, compWeight);
+      
+		help_w = (g_data *)removeHeap(q, compWeight);
         aux_vertex = help_w->vertex;
         
 		if(wt[aux_vertex] != MAX_WT){
-			aux_adj = graphGetAdj(g);
-             
-            for(t = aux_adj[aux_vertex]; t != NULL; t = nextNode(t)) {
+			
+            aux_adj = graphGetAdj(g); 
+			for(t = aux_adj[aux_vertex]; t != NULL; t = nextNode(t)) {
                 aux = (g_data *)getData(t);
                 w = aux->vertex;
-                aux_w = aux->weight;
-
-                /*printf(" EStamos na lista de adj de:%d, no vertice:%d, que tem um peso:%d\n",aux_vertex,w, aux_w); */
-               
+               aux_w = aux->weight;
+				
+                          
 				if(wt[w] > (wt[aux_vertex] + aux_w)) {
 					wt[w] = (wt[aux_vertex] + aux_w);
-                    changeQueueData(&q, s, newGData(wt[w], w));
-                    fixUp(q, w, compInts);
+					
+                   h_pos = find_Queuev(q, verts ,w);/*Encontrar pos da heap com o vertice w para lhe alterar o peso*/
+                   	
+                   
+                    changeQueueData(&q, h_pos, newGData(wt[w], w));   
+                    
+                    fixUp(q, h_pos, compInts);
 					st[w] = aux_vertex;
+				
+			
 				}
 			}
 		}
@@ -194,3 +207,4 @@ void freeMatrix(char ***mat, int *size, int init_size) {
 	}
 	return;
 }
+
