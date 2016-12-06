@@ -17,7 +17,7 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array);
 void wordCounter(FILE *input, int *occurrences, int *problems);
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count);
 
-void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v, char **dic[MAX_STRING], int cost);
+void printPath(FILE *input,FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v, char **dic[MAX_STRING], int cur);
 void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array);
 void problemSolver(FILE *dic, FILE *prob, FILE *path);
 

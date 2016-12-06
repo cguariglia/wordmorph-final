@@ -85,7 +85,6 @@ void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *t
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
     int i, j, n, word_weight, weight;
     node **adj_list;
-    node *aux;
     
     /* fixed bug. bons algoritmos e felizes estruturas de dados */
     
@@ -107,43 +106,29 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     }
                 }
             }
-            printf("-- finished doing adj for len %d --\n", i);
+            /*printf("-- finished doing adj for len %d --\n", i);
             
             for(j = 0; j < size_array[i]; j++) {
                 printf("adj list for word %s:\n", dict[i][j]);
                 if (adj_list[j] == NULL) printf("null\n");
                 for(aux = adj_list[j]; aux != NULL; aux = nextNode(aux)) {
                     printf(" -> %s", dict[i][((g_data *)getData(aux))->vertex]); 
-                }
-                printf("\n");
             }
+                printf("\n");*/
         }
     }
     
     return;
 }
 
-void printPath(FILE *input, FILE *output, int w_size, int *st, int cost_m, int origin_v, int final_v, char **dic[MAX_STRING], int cost) {
-	int aux;
-	
-	aux = st[final_v]; 
-	
-	printf("\nIMprimir o valor do cost_m%d \n", cost_m);
-	/*Calculate cost_morph, if cost_morph>cost cost=-1 */
-	if(cost == -1)
-        cost_m = -1;
-
-	
-	writefirstOutput(output, dic[w_size][origin_v], cost_m);
-	
-	/*Retrace path to origin vertice*/
-	while((aux != origin_v) && (cost_m != -1)) {
-        aux = st[aux];
-	 
+void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, char **dic[MAX_STRING], int cur) {
+    /*Retrace path to origin vertice*/
+    if(st[cur] == -1) return;
+	else if(cur != -1 && st[cur] != -1) {
 	    /*Print word correspondent to vertex aux*/
-	    writeOutput(output, dic[w_size][aux]);
+        printPath(output, w_size, st, origin_v, final_v, dic, st[cur]);
+        writeOutput(output, dic[w_size][cur]);
 	}
-    
 
 	fprintf(output, "\n"); 
 
@@ -178,17 +163,13 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
-        printf("\n\tVertice de origem:%d \n", origin_v); 
- 
-	    dijkstra(all_graphs[length], origin_v, st, wt);
-	    printf("\n A smooth criminal!\n");
-	    
-        for( i = 0; i < verts; i++) printf("\nImprimir o st:%d",st[i]);
-        for( i = 0; i < verts; i++) printf("\nImprimir o wt:%d",wt[i]);
         
-		
-			
-        printPath(input, output, length, st, wt[final_v], origin_v, final_v, dictionary, st[final_v]);
+	    dijkstra(all_graphs[length], origin_v, st, wt);
+        
+        writefirstOutput(output, dictionary[length][origin_v], cost); /* Since the first line is special */			
+        printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
+        writeOutput(output, dictionary[length][final_v]);
+        
         free(wt);
         free(st);
     }

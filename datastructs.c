@@ -267,11 +267,7 @@ void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue 
 
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
-    /*  fixLowerPriority(q, 0, n_p, lowerPriority, compItem);
     
-	aux = q->data[q->first];
-	--(q->first); */
-
 	/*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso*/
 	aux = q->data[0]; /*Remove item at root of heap*/
 	q->data[0]=q->data[q->first-1];	/*Put the last value in the array at the root of the heap*/
@@ -280,7 +276,6 @@ Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	--(q->size);
 	fixDown(q, 0, q->size, compItem); /* FixDown to reinstate heap condition*/
 		
-	/*vertex = getVertex(aux);*/ /*Get value of vertex priviously at the root  */
 	return aux;
 }
 
