@@ -83,27 +83,39 @@ void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *t
 }
 
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
-    int i, j, n, word_weight;
-    g_data _insert_data = {0, 0};
-    g_data *insert_data = &_insert_data;
-    node **aux_list;
+    int i, j, n, word_weight, weight;
+    node **adj_list;
+    node *aux;
+    
+    /* fixed bug. bons algoritmos e felizes estruturas de dados */
     
     for(i = 0; i < MAX_STRING; i++) {
-        if(max_change[i] > 0) {
+        if(max_change[i] > 0) {    
             all_graphs[i] = graphInit(size_array[i]);
-            aux_list = graphGetAdj(all_graphs[i]);
-     
+            adj_list = graphGetAdj(all_graphs[i]);
+            
+            /* actually build the adj linked list for each word of i letters */
             for(j = 0; j < size_array[i]; j++) {
                 for(n = 0; n < j; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n]);
-                    insert_data->weight = word_weight * word_weight;
+                    
                     if(word_weight > 0 && word_weight <= max_change[i]) {
-                        insert_data->vertex = n;
-                        aux_list[j] = insertSortedList(aux_list[j], insert_data, compWeight);
-                        insert_data->vertex = j;
-                        aux_list[n] = insertSortedList(aux_list[n], insert_data, compWeight);
+                        weight = word_weight * word_weight;
+                        
+                        adj_list[j] = insertSortedList(adj_list[j], newGData(weight, n), compWeight);
+                        adj_list[n] = insertSortedList(adj_list[n], newGData(weight, j), compWeight);
                     }
                 }
+            }
+            printf("-- finished doing adj for len %d --\n", i);
+            
+            for(j = 0; j < size_array[i]; j++) {
+                printf("adj list for word %s:\n", dict[i][j]);
+                if (adj_list[j] == NULL) printf("null\n");
+                for(aux = adj_list[j]; aux != NULL; aux = nextNode(aux)) {
+                    printf(" -> %s", dict[i][((g_data *)getData(aux))->vertex]);
+                }
+                printf("\n");
             }
         }
     }
@@ -151,7 +163,6 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
     rewind(input);
 	
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
-        printf("annie are you okay? are you okay annie?\n");
         length = strlen(aux1);
         
         for(i = 0; i < size_array[strlen(aux1)]; i++) {
@@ -162,16 +173,13 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         }
         
         verts = graphGetVert(all_graphs[length]);
-        printf("verts: %d origin_v: %d final_v: %d\n", verts, origin_v, final_v);
         
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
         
 	    dijkstra(all_graphs[length], origin_v, st, wt);
-        printf("post dijkstra\n");
         
         printPath(input, output, length, st, wt[final_v], origin_v, final_v, dictionary, cost);
-        printf("still with us?\n");
         free(wt);
         free(st);
     }
@@ -199,12 +207,12 @@ void problemSolver(FILE *dic, FILE *prob, FILE *path) {
     initDictionary(prob, dic, dict, changed_letters, word_count);
     
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
+    /*printf("\n O bebe nao se da muito bem com grafos grandes - to fix\n");*/
     initGraphs(all_graphs, changed_letters, word_count, dict);
-    
     solveAllProblems(prob, path, all_graphs, dict, word_count);
-    
+    /*Isto da problemas
     freeAllGraphs(all_graphs, word_count);
-    freeMatrix(dict, word_count, MAX_STRING);
+    freeMatrix(dict, word_count, MAX_STRING);*/ 
     
     return;
 }
