@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	/* Verify file extensions and open Input files*/
 	fpdic = fcheck(argv[1], ".dic");
 	fpprob = fcheck(argv[2], ".pal");
-    
+  
     filename = outputFileExtension(argv[2]);
     fppath = fopen(filename, "w");
   

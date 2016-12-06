@@ -208,7 +208,7 @@ int emptyHeap(queue *q) {
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
     
-    if(q->first + 1 < q->size) {
+    if(q->first + 1 <= q->size) {
         q->data[q->first] = data;/*Insert in the first free position of the array*/
         fixUp(q, q->first, compItem); /* FixUp to reinstate heap condition*/
         q->first += 1;
@@ -222,8 +222,9 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
 
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
-    
+         
 	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {
+ 
         aux = q->data[idx];
         q->data[idx] = q->data[(idx-1)/2];
         q->data[(idx - 1)/2] = aux;
@@ -236,16 +237,16 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     int child;
-	
 	while (2 * idx < n - 1){
+
 		child = 2 * idx + 1;
 		
 		if(child < (n - 1) && compItem(q->data[child], q->data[child + 1]) > 0)
             child++;
-		
+  
 		if(compItem(q->data[idx], q->data[child]) < 0)
             break;
-		
+            
 		aux = q->data[idx];
 		q->data[idx] = q->data[child];
 		q->data[child] = aux;
@@ -270,17 +271,16 @@ Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
     
 	aux = q->data[q->first];
 	--(q->first); */
-		
+
 	/*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso*/
 	aux = q->data[0]; /*Remove item at root of heap*/
 	q->data[0]=q->data[q->first-1];	/*Put the last value in the array at the root of the heap*/
 	
 	--(q->first); /* Update heap properties*/
-	/*--(q->size);*/
-	
+	--(q->size);
 	fixDown(q, 0, q->size, compItem); /* FixDown to reinstate heap condition*/
+		
 	/*vertex = getVertex(aux);*/ /*Get value of vertex priviously at the root  */
-	
 	return aux;
 }
 

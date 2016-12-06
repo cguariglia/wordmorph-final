@@ -113,7 +113,7 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                 printf("adj list for word %s:\n", dict[i][j]);
                 if (adj_list[j] == NULL) printf("null\n");
                 for(aux = adj_list[j]; aux != NULL; aux = nextNode(aux)) {
-                    printf(" -> %s", dict[i][((g_data *)getData(aux))->vertex]);
+                    printf(" -> %s", dict[i][((g_data *)getData(aux))->vertex]); 
                 }
                 printf("\n");
             }
@@ -127,10 +127,12 @@ void printPath(FILE *input, FILE *output, int w_size, int *st, int cost_m, int o
 	int aux;
 	
 	aux = st[final_v]; 
-
+	
+	printf("\nIMprimir o valor do cost_m%d \n", cost_m);
 	/*Calculate cost_morph, if cost_morph>cost cost=-1 */
-	if(cost_m > cost)
+	if(cost == -1)
         cost_m = -1;
+
 	
 	writefirstOutput(output, dic[w_size][origin_v], cost_m);
 	
@@ -142,7 +144,7 @@ void printPath(FILE *input, FILE *output, int w_size, int *st, int cost_m, int o
 	    writeOutput(output, dic[w_size][aux]);
 	}
     
-	writeOutput(output, dic[w_size][aux]);
+
 	fprintf(output, "\n"); 
 
     return;
@@ -176,10 +178,17 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
-        
+        printf("\n\tVertice de origem:%d \n", origin_v); 
+ 
 	    dijkstra(all_graphs[length], origin_v, st, wt);
+	    printf("\n A smooth criminal!\n");
+	    
+        for( i = 0; i < verts; i++) printf("\nImprimir o st:%d",st[i]);
+        for( i = 0; i < verts; i++) printf("\nImprimir o wt:%d",wt[i]);
         
-        printPath(input, output, length, st, wt[final_v], origin_v, final_v, dictionary, cost);
+		
+			
+        printPath(input, output, length, st, wt[final_v], origin_v, final_v, dictionary, st[final_v]);
         free(wt);
         free(st);
     }
@@ -207,8 +216,8 @@ void problemSolver(FILE *dic, FILE *prob, FILE *path) {
     initDictionary(prob, dic, dict, changed_letters, word_count);
     
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
-    /*printf("\n O bebe nao se da muito bem com grafos grandes - to fix\n");*/
-    initGraphs(all_graphs, changed_letters, word_count, dict);
+ 
+    initGraphs(all_graphs, changed_letters, word_count, dict);   
     solveAllProblems(prob, path, all_graphs, dict, word_count);
     /*Isto da problemas
     freeAllGraphs(all_graphs, word_count);

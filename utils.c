@@ -124,52 +124,86 @@ void writeOutput(FILE * fp, char * word) {
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
 	g_data *help_w;
-    int w, verts, aux_w;
-    g_data _v = {0, 0};
-	g_data *v, *aux;
+	g_data **sos;
+    int w,vertex, verts, aux_vertex, aux_w, i=-1;
+    g_data _v = {0, 0}, _max_wt = {MAX_WT, MAX_WT};
+	g_data *v,  *max_wt;
     queue *q;
     node **aux_adj;
 	node *t;
+	g_data * aux;
 
-    v = &_v;
+
+	      printf("\n\tVertice de origem no dj:%d \n", s); 
+    /* g_data *insert_data = &_insert_data;
+    max_wt = &_v;*/
+    /*v = &_v;*/
     verts = graphGetVert(g); 
-	q = queueInit(verts + 1);
-    
-	for(v->vertex = 0; v->vertex < verts; (v->vertex)++) {
-        st[v->vertex] = v->vertex;
-		wt[v->vertex] = MAX_WT;
-		v->weight = MAX_WT;	
-		insertInHeap(q, v, compWeight);
-	}
-    
-	wt[s] = 0;
-	/*fixUp(q, s, compInts);*/
-    
-	fixLowerPriority(q, verts - 1 - s, 0, lowerWeight, compWeight);
+	q = queueInit(verts);
+	for(vertex = 0; vertex < verts; (vertex)++) {
+		st[vertex] = -1;
+		wt[vertex] = MAX_WT;
+		/*v->weight = MAX_WT;	*/
+				
+		insertInHeap(q, newGData(MAX_WT, vertex) , compWeight);  /* O mesmo raciocinio para a heap*/
+		/*Para imprimir o valor do vertice que esta no vetor da heap na pos[v->vertex] */
+		sos=(g_data **)queueGetData(q);
+		printf("\nNa heap esta la agora o vertice:%d",sos[vertex]->vertex );
 
+	}
+	
+	
+	wt[s] = 0;
+	changeQueueData(&q, s, newGData(0, s));    /* Mudar o peso do vertice s no vetor da queue*/
+	fixUp(q, s, compInts);
+	/*Soo far soo bueno */
+	
+	for(i = 0; i < verts; i++){ 	/*So para confirmar os resultados do fixup */		
+		sos =(g_data **)queueGetData(q);
+		printf("\n\tNa heap esta la agora o vertice:%d",sos[i]->vertex );
+	}
+	
+	
+	/*fixLowerPriority(q, verts - 1 - s, 0, lowerWeight, compInts);*
+    max_wt = &_max_wt;*/
 	while(!emptyHeap(q)) {
-        help_w = (g_data *)removeHeap(q, compWeight);
+       /* help_w = (g_data *)removeHeap(q, max_wt, lowerWeight, compInts);
+        printf("dijkstra 3\n");
         aux_w = help_w->vertex;
+        printf("aux_w: %d \n", aux_w);*/
         
-        if(wt[aux_w] != MAX_WT){
-            aux_adj = graphGetAdj(g);
-			for(t = aux_adj[4]; t != NULL; t = nextNode(t)) {
-                aux = getData(t);
+		printf("\n consegui entrar no while\n"); 
+
+		help_w = (g_data *)removeHeap(q, compWeight);
+        aux_vertex = help_w->vertex;
+        
+		if(wt[aux_vertex] != MAX_WT){
+			
+			printf("\nE ENTREI NO IF\n");
+            aux_adj = graphGetAdj(g); 
+           /*printf("dijkstra 4\n");*/
+			for(t = aux_adj[aux_vertex]; t != NULL; t = nextNode(t)) {
+                aux = (g_data *)getData(t);
+               /* w = aux->vertex;*/
                 w = aux->vertex;
- 
-                if(wt[w] > (wt[v->vertex] + aux_w)) {
-					wt[w] = (wt[v->vertex] + aux_w);
+                aux_w = aux->weight;
+
+               printf(" EStamos na lista de adj de:%d, no vertice:%d, que tem um peso:%d\n",aux_vertex,w, aux_w); 
+               
+				if(wt[w] > (wt[aux_vertex] + aux_w)) {
+					wt[w] = (wt[aux_vertex] + aux_w);
+					printf("\n Ja no ultimo IF do dj, wt[%d] = ( wt[%d]=%d ) + ( aux_w=%d ) = %d",w,aux_vertex, wt[aux_vertex], aux_w , wt[w]);
                   /*  fixLowerPriority(q, verts - 1 - w, &wt[w], lowerWeight, compInts);*/
-                   fixUp(q, w, compInts);
-					st[w] = v->vertex;
-                    /*printf("\nNO st fica:%d\n", v->vertex);*/
+                    fixUp(q, w, compInts);
+					st[w] = aux_vertex;
 				}
 			}
 		}
 	}
-
     return;
 }
+
+
 
 /*void dijkstra(graph *g, int s, int *st, int *wt) {
 	g_data *help_w;
