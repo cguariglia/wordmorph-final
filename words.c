@@ -104,6 +104,7 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     if(word_weight > 0 && word_weight <= max_change[i]) {
                         weight = word_weight * word_weight;
                         
+                        /* Adds the vertices in each sorted list */
                         adj_list[j] = insertSortedList(adj_list[j], newGData(weight, n), compWeight);
                         adj_list[n] = insertSortedList(adj_list[n], newGData(weight, j), compWeight);
                     }
@@ -132,11 +133,13 @@ void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, cha
 
 int calculateTotalCost(int *st, int final_v, char **dic) {
     int total_cost = 0;
+    int non_squared_weight;
     
+    /* Goes through the path until the end, calculating the weight in the meantime */
     while(st[final_v] != -1) {
-        total_cost += calculateDifferentLetters(dic[final_v], dic[st[final_v]]);
+        non_squared_weight = calculateDifferentLetters(dic[final_v], dic[st[final_v]]);
+        total_cost += non_squared_weight * non_squared_weight;
         final_v = st[final_v];
-        
     }
     
     return total_cost;
@@ -160,6 +163,7 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
         length = strlen(aux1);
         
+        /* Finding where the chosen words are in our dictiornary */
         for(i = 0; i < size_array[strlen(aux1)]; i++) {
             if(strcmp(aux1, dictionary[length][i]) == 0)
                 origin_v = i;
@@ -180,7 +184,6 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
         writeOutput(output, dictionary[length][final_v]);
         fprintf(output, "\n");
-        printf("\n");
         
         free(wt);
         free(st);

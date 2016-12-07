@@ -110,7 +110,7 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
 void writefirstOutput(FILE * fp, char * word, int cost) { 
 	
     fprintf(fp, "%s %d\n", word, cost); /* Write origin word and cost*/
-    printf("%s %d\n", word, cost);
+    /* printf("%s %d\n", word, cost); */
 
     return;
 }
@@ -118,7 +118,7 @@ void writefirstOutput(FILE * fp, char * word, int cost) {
 void writeOutput(FILE * fp, char * word) { 
     
     fprintf(fp, "%s\n", word);
-    printf("%s\n", word);
+    /* printf("%s\n", word); */
 
     return;
 }
