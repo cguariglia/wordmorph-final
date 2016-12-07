@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
   
     problemSolver(fpdic, fpprob, fppath);
 	
+    free(filename);
     fclose(fpdic);
 	fclose(fpprob);
  

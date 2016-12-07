@@ -101,15 +101,16 @@ int compWeight(Item i1, Item i2) {
 void lowerWeight(queue *q, int idx, Item new_weight) {
     g_data _data = {0, 0};
     g_data *data = &_data;
-    changeQueueData(&q, idx, data);
+    
+    changeQueueData(q, idx, data);
     return;
 }
 
 /*Write the first line for each problem in the solution file */
 void writefirstOutput(FILE * fp, char * word, int cost) { 
 	
-    fprintf(fp, "\n%s %d\n", word, cost); /* Write origin word and cost*/
-    /*printf("\n%s %d\n", word, cost);*/
+    fprintf(fp, "%s %d\n", word, cost); /* Write origin word and cost*/
+    printf("%s %d\n", word, cost);
 
     return;
 }
@@ -117,38 +118,32 @@ void writefirstOutput(FILE * fp, char * word, int cost) {
 void writeOutput(FILE * fp, char * word) { 
     
     fprintf(fp, "%s\n", word);
-    /*printf("%s\n", word); */
+    printf("%s\n", word);
 
     return;
 }
 
 void dijkstra(graph *g, int s, int *st, int *wt) {
 	g_data *help_w;
-	g_data **sos;
-    int w,vertex, verts, aux_vertex, aux_w, i=-1;
-    g_data _v = {0, 0}, _max_wt = {MAX_WT, MAX_WT};
-	g_data *v,  *max_wt;
+    int w, vertex, verts, aux_vertex, aux_w;
     queue *q;
     node **aux_adj;
 	node *t;
 	g_data * aux;
 	int h_pos;
-
-    /* g_data *insert_data = &_insert_data;
-    max_wt = &_v;*/
-    /*v = &_v;*/
+    
     verts = graphGetVert(g); 
 	q = queueInit(verts);
+    
 	for(vertex = 0; vertex < verts; (vertex)++) {
 		st[vertex] = -1;
 		wt[vertex] = MAX_WT;
-					
 		insertInHeap(q, newGData(MAX_WT, vertex) , compWeight); 
 	}
 	
 	
 	wt[s] = 0;
-	changeQueueData(&q, s, newGData(0, s));    /* Mudar o peso do vertice s no vetor da queue*/
+	changeQueueData(q, s, newGData(0, s)); /* Mudar o peso do vertice s no vetor da queue*/
 	fixUp(q, s, compInts);
 
 	while(!emptyHeap(q)) {
@@ -162,25 +157,24 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
 			for(t = aux_adj[aux_vertex]; t != NULL; t = nextNode(t)) {
                 aux = (g_data *)getData(t);
                 w = aux->vertex;
-               aux_w = aux->weight;
+                aux_w = aux->weight;
 				
                           
 				if(wt[w] > (wt[aux_vertex] + aux_w)) {
 					wt[w] = (wt[aux_vertex] + aux_w);
 					
-                   h_pos = find_Queuev(q, verts ,w);/*Encontrar pos da heap com o vertice w para lhe alterar o peso*/
-                   	
-                   
-                    changeQueueData(&q, h_pos, newGData(wt[w], w));   
+                    h_pos = findQueueV(q, verts, w);/*Encontrar pos da heap com o vertice w para lhe alterar o peso*/
+                    changeQueueData(q, h_pos, newGData(wt[w], w));   
                     
                     fixUp(q, h_pos, compInts);
 					st[w] = aux_vertex;
-				
-			
 				}
 			}
 		}
 	}
+    
+    freeHeap(q);
+    
     return;
 }
 

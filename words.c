@@ -10,12 +10,15 @@
 /* Check which graphs need to be built based upon the problem file. Also max weight */
 void problemCounter(FILE *prob, int *problem_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int max_change, i;
+	int max_change, i, diff;
 	
 	for(i = 0; i < MAX_STRING; i++)
 		problem_array[i] = 0;
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
+        diff = calculateDifferentLetters(aux1, aux2);
+        if(diff < max_change)
+            max_change = diff;
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }
@@ -85,7 +88,6 @@ void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *t
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
     int i, j, n, word_weight, weight;
     node **adj_list;
-    node *aux;
     
     /* fixed bug. bons algoritmos e felizes estruturas de dados */
     
@@ -107,16 +109,6 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     }
                 }
             }
-       /*     printf("-- finished doing adj for len %d --\n", i);
-            
-            for(j = 0; j < size_array[i]; j++) {
-                printf("adj list for word %s:\n", dict[i][j]);
-                if (adj_list[j] == NULL) printf("null\n");
-                for(aux = adj_list[j]; aux != NULL; aux = nextNode(aux)) {
-                    printf(" -> %s", dict[i][((g_data *)getData(aux))->vertex]); 
-                }
-                printf("\n");
-            }*/
         }
     }
     
@@ -126,19 +118,29 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
 
 
 void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, char **dic[MAX_STRING], int cur) {
-    /*Retrace path to origin vertice*/
-    if(st[cur] == -1) return;
+    
+    /* Retrace path to origin vertice */
+    if(cur == -1 || st[cur] == -1) return;
 	else if(cur != -1 && st[cur] != -1) {
-	    /*Print word correspondent to vertex aux*/
+	    /* Print word correspondent to vertex aux */
         printPath(output, w_size, st, origin_v, final_v, dic, st[cur]);
         writeOutput(output, dic[w_size][cur]);
 	}
 
-	fprintf(output, "\n"); 
-
     return;
 }
 
+int calculateTotalCost(int *st, int final_v, char **dic) {
+    int total_cost = 0;
+    
+    while(st[final_v] != -1) {
+        total_cost += calculateDifferentLetters(dic[final_v], dic[st[final_v]]);
+        final_v = st[final_v];
+        
+    }
+    
+    return total_cost;
+}
 
 
 void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array) {
@@ -172,17 +174,13 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         
 	    dijkstra(all_graphs[length], origin_v, st, wt);
         
+        writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length])); /* Since the first line is special */		
         
-                for( i = 0; i < verts; i++) printf("\nImprimir o st:%d",st[i]);
-        /*for( i = 0; i < verts; i++) printf("\tImprimir o wt:%d",wt[i]);*/
-        
-        printf("\n\tVertice de origem:%d \n", origin_v); 
-        printf("\n\tVertice final:%d \n", final_v); 
-
-        
-        writefirstOutput(output, dictionary[length][origin_v], cost); /* Since the first line is special */			
+        /* To ensure correct output */
         printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
         writeOutput(output, dictionary[length][final_v]);
+        fprintf(output, "\n");
+        printf("\n");
         
         free(wt);
         free(st);
@@ -216,9 +214,9 @@ void problemSolver(FILE *dic, FILE *prob, FILE *path) {
  
     initGraphs(all_graphs, changed_letters, word_count, dict);   
     solveAllProblems(prob, path, all_graphs, dict, word_count);
-    /*Isto da problemas
+    
     freeAllGraphs(all_graphs, word_count);
-    freeMatrix(dict, word_count, MAX_STRING);*/ 
+    freeMatrix(dict, word_count, MAX_STRING);
     
     return;
 }

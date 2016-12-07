@@ -38,7 +38,7 @@ void freeGraph(graph *g, void (* freeItem)(Item));
 queue * queueInit(int size);
 int queueIsEmpty(queue *q);
 Item * queueGetData(queue *q);
-void changeQueueData(queue **q, int idx, Item new_value);
+void changeQueueData(queue *q, int idx, Item new_value);
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2));
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2));
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2));
@@ -48,7 +48,9 @@ Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2));
 int getGraphVertex(Item info);
 int getGraphWeight(Item info);
 Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2));
-int find_Queuev(queue *q, int original_qsize, int vertex);
-int get_qsize(queue *q);
+int findQueueV(queue *q, int original_qsize, int vertex);
+int getQSize(queue *q);
+void freeHeap(queue *q);
+
 #endif
 

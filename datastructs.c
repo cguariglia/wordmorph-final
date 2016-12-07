@@ -195,8 +195,9 @@ Item * queueGetData(queue *q) {
 }
 
 /* Gives the user an opportunity to change the queue data */
-void changeQueueData(queue **q, int idx, Item new_value) {
-    (*q)->data[idx] = new_value;
+void changeQueueData(queue *q, int idx, Item new_value) {
+    free(q->data[idx]);
+    q->data[idx] = new_value;
     return;
 }
 
@@ -230,8 +231,8 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
         q->data[(idx - 1)/2] = aux;
         idx = (idx - 1) / 2;
 
-}
-	
+    }
+
 	
     return;
 }
@@ -268,8 +269,8 @@ void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue 
     return;
 }
 
-int find_Queuev(queue *q, int original_qsize, int vertex){
-	int vertex_pos, aux=0;
+int findQueueV(queue *q, int original_qsize, int vertex){
+	int aux = 0;
 	
 	g_data *info;
 	
@@ -283,36 +284,23 @@ int find_Queuev(queue *q, int original_qsize, int vertex){
 	return aux;
 }
 
-int get_qsize(queue *q)
-{return q->size;
-	}
+int getQSize(queue *q) {
+    return q->size;
+}
 
 
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
-		g_data **sos;
-			int i;
-    /*  fixLowerPriority(q, 0, n_p, lowerPriority, compItem);
-
-	aux = q->data[q->first];
-	--(q->first); */
-
-	/*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso*/
+    
+    /*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso*/
 	aux = q->data[0]; /*Remove item at root of heap*/
-	q->data[0]=q->data[q->first-1];	/*Put the last value in the array at the root of the heap*/
+	q->data[0] = q->data[q->first-1];	/*Put the last value in the array at the root of the heap*/
 
-
-	
 	--(q->first); /* Update heap properties*/
 	--(q->size);
 	
-	
-
-
 	fixDown(q, 0, q->size, compItem); /* FixDown to reinstate heap condition*/
 
-
-	/*vertex = getVertex(aux);*/ /*Get value of vertex priviously at the root  */
 	return aux;
 }
 
@@ -345,7 +333,15 @@ Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	return aux;
 }
 
-void freeHeap() {
+void freeHeap(queue *q) {
+    int i;
     
+    for(i = 0; i < q->size; i++)
+        free(q->data[i]);
+        
+    free(q->data);
+    free(q);
+    
+    return;
 }
 
