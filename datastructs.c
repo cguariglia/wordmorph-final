@@ -196,14 +196,15 @@ Item * queueGetData(queue *q) {
 
 /* Gives the user an opportunity to change the queue data */
 void changeQueueData(queue *q, int idx, Item new_value) {
-    free(q->data[idx]);
+    if(q->data[idx] != NULL)
+        free(q->data[idx]);
     q->data[idx] = new_value;
     return;
 }
 
 /* Checks if the heap is empty or not */
 int emptyHeap(queue *q) {	
-     return (q->size == 0);
+     return (q->first == 0);
 }
 
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
@@ -225,14 +226,12 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 
          
 	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {
- 
         aux = q->data[idx];
         q->data[idx] = q->data[(idx-1)/2];
         q->data[(idx - 1)/2] = aux;
         idx = (idx - 1) / 2;
 
     }
-
 	
     return;
 }
@@ -261,14 +260,14 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
     return;
 }
 
-/* This is a terrible function name.
- * It lowers something's priority and then fixes the heap afterwards. */
+/* Lowers something's priority and then fixes the heap afterwards. */
 void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2)) {
     lowerPriority(q, idx, n_p);
     fixUp(q, idx, compItem);
     return;
 }
 
+/* Finds the index in which a specific vertex is located */
 int findQueueV(queue *q, int original_qsize, int vertex){
 	int aux = 0;
 	
@@ -276,7 +275,7 @@ int findQueueV(queue *q, int original_qsize, int vertex){
 	
 	while(aux < q->size){
 		info = (g_data *)q ->data[aux];
-		if( info->vertex == vertex  )
+		if(info->vertex == vertex)
 			return aux;
 		aux++;
 	}
@@ -292,31 +291,25 @@ int getQSize(queue *q) {
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     
-    /*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso*/
+    /*Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso */
 	aux = q->data[0]; /*Remove item at root of heap*/
-	q->data[0] = q->data[q->first-1];	/*Put the last value in the array at the root of the heap*/
+	q->data[0] = q->data[q->first - 1];	/*Put the last value in the array at the root of the heap */
 
-	--(q->first); /* Update heap properties*/
-	--(q->size);
+	--(q->first); /* Update heap properties */
 	
-	fixDown(q, 0, q->size, compItem); /* FixDown to reinstate heap condition*/
+	fixDown(q, 0, q->first, compItem); /* FixDown to reinstate heap condition */
 
 	return aux;
 }
 
-
-
 int getGraphVertex(Item info) {
-	g_data *aux = info;
-	 
-	return aux->vertex;
+	return ((g_data *)info)->vertex;
 }
 int getGraphWeight(Item info) {
-	g_data *aux = info;
-	 
-	return aux->weight;
+	return ((g_data *)info)->weight;
 }
 
+/* Remove o item mais pequeno da heap, voltando a repor a condição de heap de seguida */
 Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     
@@ -333,12 +326,13 @@ Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	return aux;
 }
 
+/* Faz free da heap e de todos os seus componentes */
 void freeHeap(queue *q) {
     int i;
     
-    for(i = 0; i < q->size; i++)
+    for(i = 0; i < q->first; i++)
         free(q->data[i]);
-        
+
     free(q->data);
     free(q);
     

@@ -47,27 +47,16 @@ char* outputFileExtension(char * name_input){
 	return name_output;
 }
 
-/* Binary searches. */
-int binarySearch(char *array[], int size, char *value) {
-	int left, right, middle;
-	
-	left = 0;
-	right = size;
-	
-	while(left <= right) {
-		middle = (right + left) / 2;
-		
-		if(strcmp(array[middle], value) > 0)
-			right = middle - 1;
-		else if(strcmp(array[middle], value) < 0)
-			left = middle + 1;
-		else 
-			return middle;
-	}
-	
-	return -1;
+/* Returns how many different letters there are in two words */
+int calculateDifferentLetters(char *word1, char *word2) {
+    int i, different_letters = 0;
+    
+    for(i = 0; i < strlen(word1); i++)
+        if(word1[i] != word2[i])
+            different_letters += 1;
+    
+    return different_letters;
 }
-
 
 int compInts(Item i1, Item i2) {
     int *num1 = i1;
@@ -98,6 +87,7 @@ int compWeight(Item i1, Item i2) {
     return 0;
 }
 
+/* Lowers something's priority (in this case, by lowering its weight */
 void lowerWeight(queue *q, int idx, Item new_weight) {
     g_data _data = {0, 0};
     g_data *data = &_data;
@@ -106,71 +96,55 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
     return;
 }
 
-/*Write the first line for each problem in the solution file */
-void writefirstOutput(FILE * fp, char * word, int cost) { 
-	
-    fprintf(fp, "%s %d\n", word, cost); /* Write origin word and cost*/
-    /* printf("%s %d\n", word, cost); */
-
-    return;
-}
-
-void writeOutput(FILE * fp, char * word) { 
-    
-    fprintf(fp, "%s\n", word);
-    /* printf("%s\n", word); */
-
-    return;
-}
-
-void dijkstra(graph *g, int s, int *st, int *wt) {
-	g_data *help_w;
-    int w, vertex, verts, aux_vertex, aux_w;
+void dijkstra(graph *g, int s, int end, int *st, int *wt) {
+    int w, vertex, verts, aux_w, h_pos;
     queue *q;
     node **aux_adj;
 	node *t;
-	g_data * aux;
-	int h_pos;
+	g_data *aux, *help_w;
     
+    /* Inicializar a queue / heap com todos os pesos no maximo */
     verts = graphGetVert(g); 
 	q = queueInit(verts);
-    
-	for(vertex = 0; vertex < verts; (vertex)++) {
+	for(vertex = 0; vertex < verts; vertex++) {
 		st[vertex] = -1;
 		wt[vertex] = MAX_WT;
-		insertInHeap(q, newGData(MAX_WT, vertex) , compWeight); 
+		insertInHeap(q, newGData(MAX_WT, vertex), compWeight); 
 	}
-	
-	
+    
+    /* Por a prioridade do ponto de partida a 0 */
 	wt[s] = 0;
 	changeQueueData(q, s, newGData(0, s)); /* Mudar o peso do vertice s no vetor da queue*/
-	fixUp(q, s, compInts);
+	fixUp(q, s, compWeight);
 
 	while(!emptyHeap(q)) {
-      
-		help_w = (g_data *)removeHeap(q, compWeight);
-        aux_vertex = help_w->vertex;
+        help_w = (g_data *)removeHeap(q, compWeight);
         
-		if(wt[aux_vertex] != MAX_WT){
-			
+        if(help_w->vertex == end)
+            break;
+            
+		if(wt[help_w->vertex] != MAX_WT) {
+            
             aux_adj = graphGetAdj(g); 
-			for(t = aux_adj[aux_vertex]; t != NULL; t = nextNode(t)) {
+			for(t = aux_adj[help_w->vertex]; t != NULL; t = nextNode(t)) {
                 aux = (g_data *)getData(t);
                 w = aux->vertex;
                 aux_w = aux->weight;
 				
                           
-				if(wt[w] > (wt[aux_vertex] + aux_w)) {
-					wt[w] = (wt[aux_vertex] + aux_w);
+				if(wt[w] > (wt[help_w->vertex] + aux_w)) {
+					wt[w] = (wt[help_w->vertex] + aux_w);
 					
-                    h_pos = findQueueV(q, verts, w);/*Encontrar pos da heap com o vertice w para lhe alterar o peso*/
-                    changeQueueData(q, h_pos, newGData(wt[w], w));   
+                    h_pos = findQueueV(q, verts, w); /*Encontrar pos da heap com o vertice w para lhe alterar o peso */
+                    changeQueueData(q, h_pos, newGData(wt[w], w));
+                    fixUp(q, h_pos, compWeight);
                     
-                    fixUp(q, h_pos, compInts);
-					st[w] = aux_vertex;
+					st[w] = help_w->vertex;
 				}
 			}
 		}
+        
+        free(help_w); /* free the helper pointer slave dude */
 	}
     
     freeHeap(q);
@@ -178,18 +152,23 @@ void dijkstra(graph *g, int s, int *st, int *wt) {
     return;
 }
 
-
-/* Returns how many different letters there are in different words */
-int calculateDifferentLetters(char *word1, char *word2) {
-    int i, different_letters = 0;
-    
-    for(i = 0; i < strlen(word1); i++)
-        if(word1[i] != word2[i])
-            different_letters += 1;
-    
-    return different_letters;
+/* Write the first line for each problem in the solution file, since it's different from all the others */
+void writefirstOutput(FILE * fp, char * word, int cost) { 
+	
+    fprintf(fp, "%s %d\n", word, cost);/* Write origin word and cost*/
+    /*printf("%s %d\n", word, cost);*/
+    return;
 }
 
+void writeOutput(FILE * fp, char * word) { 
+    
+    fprintf(fp, "%s\n", word);
+    printf("%s\n", word);
+
+    return;
+}
+
+/* Frees a whole matrix (but the size must be passed as an array) */
 void freeMatrix(char ***mat, int *size, int init_size) {
 	int i, j;
 	

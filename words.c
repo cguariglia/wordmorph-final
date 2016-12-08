@@ -10,15 +10,15 @@
 /* Check which graphs need to be built based upon the problem file. Also max weight */
 void problemCounter(FILE *prob, int *problem_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int max_change, i, diff;
+	int max_change, i;
 	
 	for(i = 0; i < MAX_STRING; i++)
 		problem_array[i] = 0;
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
-        diff = calculateDifferentLetters(aux1, aux2);
+        /*diff = calculateDifferentLetters(aux1, aux2);
         if(diff < max_change)
-            max_change = diff;
+            max_change = diff;*/
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }
@@ -36,7 +36,7 @@ void wordCounter(FILE *input, int *occurrences, int *problems) {
 		occurrences[i] = 0;
 	
 	while(fscanf(input, "%s", word) == 1) {
-		if(problems[strlen(word)] > 0) /*If the problem file involves a word of that size */
+		if(problems[strlen(word)] > 0) /* If the problem file involves a word of that size */
 			occurrences[strlen(word)] += 1; 
 	}
 		
@@ -76,6 +76,7 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	return;
 }
 
+/* Checks which word lists to build, counts the overall number of words and then actually copies the words to the matrix */
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count) {
 	
 	problemCounter(prob, to_solve);
@@ -89,14 +90,12 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
     int i, j, n, word_weight, weight;
     node **adj_list;
     
-    /* fixed bug. bons algoritmos e felizes estruturas de dados */
-    
     for(i = 0; i < MAX_STRING; i++) {
         if(max_change[i] > 0) {    
             all_graphs[i] = graphInit(size_array[i]);
             adj_list = graphGetAdj(all_graphs[i]);
             
-            /* actually build the adj linked list for each word of i letters */
+            /* Actually build the adj list for each word of i letters, comparing the words with indexes j and n*/
             for(j = 0; j < size_array[i]; j++) {
                 for(n = 0; n < j; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n]);
@@ -104,7 +103,6 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     if(word_weight > 0 && word_weight <= max_change[i]) {
                         weight = word_weight * word_weight;
                         
-                        /* Adds the vertices in each sorted list */
                         adj_list[j] = insertSortedList(adj_list[j], newGData(weight, n), compWeight);
                         adj_list[n] = insertSortedList(adj_list[n], newGData(weight, j), compWeight);
                     }
@@ -120,10 +118,10 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
 
 void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, char **dic[MAX_STRING], int cur) {
     
-    /* Retrace path to origin vertice */
+    /* Retrace path to origin vertex */
     if(cur == -1 || st[cur] == -1) return;
 	else if(cur != -1 && st[cur] != -1) {
-	    /* Print word correspondent to vertex aux */
+	    /* Print word correspondent to vertex cur */
         printPath(output, w_size, st, origin_v, final_v, dic, st[cur]);
         writeOutput(output, dic[w_size][cur]);
 	}
@@ -136,6 +134,9 @@ int calculateTotalCost(int *st, int final_v, char **dic) {
     int non_squared_weight;
     
     /* Goes through the path until the end, calculating the weight in the meantime */
+    if(st[final_v] == -1)
+        return -1;
+    
     while(st[final_v] != -1) {
         non_squared_weight = calculateDifferentLetters(dic[final_v], dic[st[final_v]]);
         total_cost += non_squared_weight * non_squared_weight;
@@ -156,14 +157,13 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho*/
 	/* Imprimir no ficheiro de saida as palavras do caminho com base nos valores no vetor s*/
 
-    /* Para cada problema */ 
+    /* Para cada problema: */ 
     
     rewind(input);
 	
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
         length = strlen(aux1);
         
-        /* Finding where the chosen words are in our dictiornary */
         for(i = 0; i < size_array[strlen(aux1)]; i++) {
             if(strcmp(aux1, dictionary[length][i]) == 0)
                 origin_v = i;
@@ -176,7 +176,7 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
         
-	    dijkstra(all_graphs[length], origin_v, st, wt);
+	    dijkstra(all_graphs[length], origin_v, final_v, st, wt);
         
         writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length])); /* Since the first line is special */		
         
