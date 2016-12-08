@@ -50,7 +50,11 @@ int getGraphWeight(Item info);
 Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2));
 int findQueueV(queue *q, int original_qsize, int vertex);
 int getQSize(queue *q);
-void freeHeap(queue *q);
+void freeHeap(queue *q, int size);
+int binarySearch(queue *q,  int vertice);
+
+
 
 #endif
+
 
