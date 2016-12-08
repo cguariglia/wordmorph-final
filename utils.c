@@ -101,7 +101,8 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
     queue *q;
     node **aux_adj;
 	node *t;
-	g_data *aux, *help_w;
+    g_data _change_data = {0, 0};
+	g_data *aux, *help_w, *change_data = &_change_data;
     
     /* Inicializar a queue / heap com todos os pesos no maximo */
     verts = graphGetVert(g); 
@@ -114,7 +115,9 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
     
     /* Por a prioridade do ponto de partida a 0 */
 	wt[s] = 0;
-	changeQueueData(q, s, newGData(0, s)); /* Mudar o peso do vertice s no vetor da queue*/
+    change_data->vertex = s;
+    change_data->weight = 0;
+	changeQueueData(q, s, change_data); /* Mudar o peso do vertice s no vetor da queue*/
 	fixUp(q, s, compWeight);
 
 	while(!emptyHeap(q)) {
@@ -136,7 +139,9 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
 					wt[w] = (wt[help_w->vertex] + aux_w);
 					
                     h_pos = findQueueV(q, verts, w); /*Encontrar pos da heap com o vertice w para lhe alterar o peso */
-                    changeQueueData(q, h_pos, newGData(wt[w], w));
+                    change_data->vertex = w;
+                    change_data->weight = wt[w];
+                    changeQueueData(q, h_pos, change_data);
                     fixUp(q, h_pos, compWeight);
                     
 					st[w] = help_w->vertex;
@@ -155,15 +160,15 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
 /* Write the first line for each problem in the solution file, since it's different from all the others */
 void writefirstOutput(FILE * fp, char * word, int cost) { 
 	
-    fprintf(fp, "%s %d\n", word, cost);/* Write origin word and cost*/
-    /*printf("%s %d\n", word, cost);*/
+    fprintf(fp, "%s %d\n", word, cost); /* Write origin word and cost */
+    /* printf("%s %d\n", word, cost); */
     return;
 }
 
 void writeOutput(FILE * fp, char * word) { 
     
     fprintf(fp, "%s\n", word);
-    printf("%s\n", word);
+    /* printf("%s\n", word); */
 
     return;
 }

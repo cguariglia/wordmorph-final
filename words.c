@@ -10,15 +10,15 @@
 /* Check which graphs need to be built based upon the problem file. Also max weight */
 void problemCounter(FILE *prob, int *problem_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int max_change, i;
+	int max_change, i, diff;
 	
 	for(i = 0; i < MAX_STRING; i++)
 		problem_array[i] = 0;
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
-        /*diff = calculateDifferentLetters(aux1, aux2);
+        diff = calculateDifferentLetters(aux1, aux2);
         if(diff < max_change)
-            max_change = diff;*/
+            max_change = diff;
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }

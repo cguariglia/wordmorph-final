@@ -196,9 +196,9 @@ Item * queueGetData(queue *q) {
 
 /* Gives the user an opportunity to change the queue data */
 void changeQueueData(queue *q, int idx, Item new_value) {
-    if(q->data[idx] != NULL)
-        free(q->data[idx]);
-    q->data[idx] = new_value;
+    g_data *actual_data = (g_data *)new_value;
+    ((g_data *)q->data[idx])->weight = actual_data->weight;
+    ((g_data *)q->data[idx])->vertex = actual_data->vertex;
     return;
 }
 
