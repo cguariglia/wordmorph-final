@@ -103,8 +103,8 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     if(word_weight > 0 && word_weight <= max_change[i]) {
                         weight = word_weight * word_weight;
                         
-                        adj_list[j] = insertSortedList(adj_list[j], newGData(weight, n), compWeight);
-                        adj_list[n] = insertSortedList(adj_list[n], newGData(weight, j), compWeight);
+                        adj_list[j] = insertList(adj_list[j], newGData(weight, n));
+                        adj_list[n] = insertList(adj_list[n], newGData(weight, j));
                     }
                 }
             }
@@ -153,9 +153,9 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
     int *wt, *st;
 	
 	
-    /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo*/
-	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho*/
-	/* Imprimir no ficheiro de saida as palavras do caminho com base nos valores no vetor s*/
+    /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo */
+	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho */
+	/* Imprimir no ficheiro de saida as palavras do caminho com base nos valores no vetor s */
 
     /* Para cada problema: */ 
     
@@ -176,19 +176,22 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
         
-	    dijkstra(all_graphs[length], origin_v, final_v, st, wt);
+        if(calculateDifferentLetters(dictionary[length][origin_v], dictionary[length][final_v]) == 1) {
+            writefirstOutput(output, dictionary[length][origin_v], 1);
+        }
+        else {
+            dijkstra(all_graphs[length], origin_v, final_v, cost * cost, st, wt);
+            
+            /* To ensure correct output */
+            writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length]));
+            printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
+        }
         
-        writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length])); /* Since the first line is special */		
-        
-        /* To ensure correct output */
-        printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
         writeOutput(output, dictionary[length][final_v]);
         fprintf(output, "\n");
         
         free(wt);
         free(st);
-  
-  
     }
 }
 

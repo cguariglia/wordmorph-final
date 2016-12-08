@@ -72,11 +72,12 @@ int compInts(Item i1, Item i2) {
     return 0;
 }
 
+/* Given two g_datas, compares their weights.
+ * Obviously the Items/void * NEED to be g_datas. */
 int compWeight(Item i1, Item i2) {
     g_data *item1 = i1;
     g_data *item2 = i2;
 
-    /* if in need of cycles use substraction for this e.g weight1 - weight2 or vice-versa */
     if(item1->weight > item2->weight)
         return 1;
     else if(item1->weight == item2->weight)
@@ -96,7 +97,7 @@ void lowerWeight(queue *q, int idx, Item new_weight) {
     return;
 }
 
-void dijkstra(graph *g, int s, int end, int *st, int *wt) {
+void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
     int w, vertex, verts, aux_w, h_pos;
     queue *q;
     node **aux_adj;
@@ -107,7 +108,8 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
     /* Inicializar a queue / heap com todos os pesos no maximo */
     verts = graphGetVert(g); 
 	q = queueInit(verts);
-	for(vertex = 0; vertex < verts; vertex++) {
+    
+    for(vertex = 0; vertex < verts; vertex++) {
 		st[vertex] = -1;
 		wt[vertex] = MAX_WT;
 		insertInHeap(q, newGData(MAX_WT, vertex), compWeight); 
@@ -122,20 +124,18 @@ void dijkstra(graph *g, int s, int end, int *st, int *wt) {
 
 	while(!emptyHeap(q)) {
         help_w = (g_data *)removeHeap(q, compWeight);
-        
         if(help_w->vertex == end)
             break;
-            
+        
 		if(wt[help_w->vertex] != MAX_WT) {
-            
             aux_adj = graphGetAdj(g); 
+            
 			for(t = aux_adj[help_w->vertex]; t != NULL; t = nextNode(t)) {
                 aux = (g_data *)getData(t);
                 w = aux->vertex;
                 aux_w = aux->weight;
-				
                           
-				if(wt[w] > (wt[help_w->vertex] + aux_w)) {
+				if(aux_w <= max_step && wt[w] > (wt[help_w->vertex] + aux_w)) {
 					wt[w] = (wt[help_w->vertex] + aux_w);
 					
                     h_pos = findQueueV(q, verts, w); /*Encontrar pos da heap com o vertice w para lhe alterar o peso */

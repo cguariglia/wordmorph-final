@@ -15,7 +15,7 @@ int compInts(Item i1, Item i2);
 int compWeight(Item item1, Item item2);
 
 void lowerWeight(queue *q, int idx, Item new_weight);
-void dijkstra(graph *g, int s, int end, int *st, int *wt);
+void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt);
 
 void writefirstOutput(FILE * fp, char * word, int cost);
 void writeOutput(FILE * fp, char * word);

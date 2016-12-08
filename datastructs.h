@@ -24,7 +24,7 @@ node * newNode(Item data, node *next);
 Item getData(node *cur);
 void freeLinkedList(node *head, void (* freeItem)(Item));
 node * nextNode(node *cur);
-node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2));
+node * insertList(node *first, Item item);
 
 g_data * newGData(int weight, int vertex);
 

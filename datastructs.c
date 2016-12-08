@@ -64,29 +64,15 @@ Item getData(node *cur) {
 
 /* Inserts node in such a way as to make a sorted list.
  * compFunc must return < 0 if the first item is smaller than the next, = 0 if it's the same and > 0 if it's bigger */
-node * insertSortedList(node *first, Item item, int (* compFunc)(Item item1, Item item2)) {
-	node *aux, *new_node;
+node * insertList(node *first, Item item) {
+	node *new_node;
     
     if(first == NULL) {
         return newNode(item, NULL);
     }
     else {
-        for(aux = first; aux != NULL; aux = aux->next) {
-            /* If the next node is null, then we can't access aux->next->data.
-             * So we insert the node at the end. */
-            if(aux->next == NULL) {
-                new_node = newNode(item, NULL);
-                aux->next = new_node;
-                return first;
-            }
-            else if(aux == first && compFunc(item, first->data) < 0)
-                return newNode(item, first);
-            else if(compFunc(item, aux->next->data) < 0) {
-                new_node = newNode(item, aux->next);
-                aux->next = new_node;
-                return first;
-            }
-        }
+        new_node = newNode(item, first);
+        return new_node;
     }
     
 	return first;
@@ -221,9 +207,9 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
     return;
 }
 
+/* Repõe a condição de heap */
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
-
          
 	while (idx > 0 && compItem(q->data[(idx-1)/2], q->data[idx]) > 0) {
         aux = q->data[idx];
@@ -236,7 +222,7 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
     return;
 }
 
-
+/* Repõe a condição de heap, caso */
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     int child;
