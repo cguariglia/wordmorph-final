@@ -51,7 +51,6 @@ node * changeNodeData(node *old, Item new_data) {
 /* Returns the node following cur */
 node * nextNode(node *cur) {
     return cur->next;
-    /*return ((cur == NULL) ? NULL : cur->next);*/
 }
 
 /* Returns cur's data */
@@ -259,7 +258,7 @@ int findQueueV(queue *q, int original_qsize, int vertex){
 	
 	g_data *info;
 	
-	while(aux < q->size){
+	while(aux < q->first){
 		info = (g_data *)q ->data[aux];
 		if(info->vertex == vertex)
 			return aux;

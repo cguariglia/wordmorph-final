@@ -4,6 +4,8 @@
 #include "utils.h"
 #include "datastructs.h"
 
+#include <time.h>
+
 /* In this file:
  * Functions that are directly linked to solving the given problem. */
 
@@ -17,14 +19,14 @@ void problemCounter(FILE *prob, int *problem_array) {
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
         diff = calculateDifferentLetters(aux1, aux2);
-        if(diff < max_change)
-            max_change = diff;
+        if(diff == 1 || diff == 0)
+            continue;
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }
 	
     rewind(prob); /* We're going to use it later, so might as well bring it back to the beginning now. */
-    
+
 	return;	
 }
 
@@ -91,7 +93,7 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
     node **adj_list;
     
     for(i = 0; i < MAX_STRING; i++) {
-        if(max_change[i] > 0) {    
+        if(max_change[i] > 0) {
             all_graphs[i] = graphInit(size_array[i]);
             adj_list = graphGetAdj(all_graphs[i]);
             
@@ -102,7 +104,6 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
                     
                     if(word_weight > 0 && word_weight <= max_change[i]) {
                         weight = word_weight * word_weight;
-                        
                         adj_list[j] = insertList(adj_list[j], newGData(weight, n));
                         adj_list[n] = insertList(adj_list[n], newGData(weight, j));
                     }
@@ -149,9 +150,11 @@ int calculateTotalCost(int *st, int final_v, char **dic) {
 
 void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0;
+	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0, j = 0, different_letters;
     int *wt, *st;
 	
+    size_t start, stop;
+    double spent1 = 0, spent2 = 0;
 	
     /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo */
 	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho */
@@ -162,6 +165,9 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
     rewind(input);
 	
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
+        printf("here comes another one\n");
+        start = clock();
+        
         length = strlen(aux1);
         
         for(i = 0; i < size_array[strlen(aux1)]; i++) {
@@ -176,9 +182,14 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
         
-        if(calculateDifferentLetters(dictionary[length][origin_v], dictionary[length][final_v]) == 1) {
-            writefirstOutput(output, dictionary[length][origin_v], 1);
-        }
+        stop = clock();
+        spent1 += (double)(stop - start) / CLOCKS_PER_SEC;
+        printf("doin' dijkstra %d\n", j++);
+        start = clock();
+        different_letters = calculateDifferentLetters(dictionary[length][origin_v], dictionary[length][final_v]);
+        
+        if(different_letters == 1 || different_letters == 0)
+            writefirstOutput(output, dictionary[length][origin_v], different_letters);
         else {
             dijkstra(all_graphs[length], origin_v, final_v, cost * cost, st, wt);
             
@@ -187,12 +198,17 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
             printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
         }
         
+        stop = clock();
+        spent2 += (double)(stop - start) / CLOCKS_PER_SEC;
+        
         writeOutput(output, dictionary[length][final_v]);
         fprintf(output, "\n");
         
         free(wt);
         free(st);
     }
+    
+    printf("spent1 = %lf secs, spent2 = %lf secs\n dont forget to remove the #include <time.h>\n", spent1, spent2);
 }
 
 void freeAllGraphs(graph **all_graphs, int *size_array) {
@@ -217,6 +233,7 @@ void problemSolver(FILE *dic, FILE *prob, FILE *path) {
     initDictionary(prob, dic, dict, changed_letters, word_count);
     
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
+    printf("hi\n");
  
     initGraphs(all_graphs, changed_letters, word_count, dict);   
     solveAllProblems(prob, path, all_graphs, dict, word_count);
