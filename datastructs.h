@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_WT 100
+#define MAX_WT 1000
 
 typedef struct _node node;
 typedef struct graph graph;

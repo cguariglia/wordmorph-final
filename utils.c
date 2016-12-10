@@ -143,7 +143,7 @@ void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
 				if(aux_w <= max_step && wt[w] > (wt[help_w->vertex] + aux_w)) {
 					wt[w] = (wt[help_w->vertex] + aux_w);
 					
-                    h_pos = findQueueV(q, w); /* Encontrar pos da heap com o vértice w para lhe alterar o peso */
+                    h_pos = findQueueV(q, w); /* Encontrar pos da heap com o vrtice w para lhe alterar o peso */
                     change_data->vertex = w;
                     change_data->weight = wt[w];
                     changeQueueData(q, h_pos, change_data);

@@ -10,4 +10,4 @@ wordmorph: $(OBJ)
 		$(CC) $(CFLAGS) -o wordmorph $(OBJ)
 		
 clean:
-		rm -f *.o *.path wordmorph *~
+		rm -f *.o *.path vgcore.* wordmorph *~

@@ -62,7 +62,7 @@ Item getData(node *cur) {
         return cur->data;
 }
 
-/* Inserts node in such a way as to make a sorted list.
+/* Inserts node in the beginning of the list 
  * compFunc must return < 0 if the first item is smaller than the next, = 0 if it's the same and > 0 if it's bigger */
 node * insertList(node *first, Item item) {
 	node *new_node;
