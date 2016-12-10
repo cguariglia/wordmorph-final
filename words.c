@@ -4,8 +4,6 @@
 #include "utils.h"
 #include "datastructs.h"
 
-#include <time.h>
-
 /* In this file:
  * Functions that are directly linked to solving the given problem. */
 
@@ -150,11 +148,8 @@ int calculateTotalCost(int *st, int final_v, char **dic) {
 
 void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0, j = 0, different_letters;
+	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0, different_letters;
     int *wt, *st;
-	
-    size_t start, stop;
-    double spent1 = 0, spent2 = 0;
 	
     /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo */
 	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho */
@@ -162,14 +157,12 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 
     /* Para cada problema: */ 
     
-    rewind(input);
+    rewind(input); /* Since we already went through the problems file before */
 	
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
-        printf("here comes another one\n");
-        start = clock();
-        
         length = strlen(aux1);
         
+        /* Finding the words in the dictionary */
         for(i = 0; i < size_array[strlen(aux1)]; i++) {
             if(strcmp(aux1, dictionary[length][i]) == 0)
                 origin_v = i;
@@ -182,12 +175,9 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         wt = (int *)allocate(verts * sizeof(int));
         st = (int *)allocate(verts * sizeof(int));
         
-        stop = clock();
-        spent1 += (double)(stop - start) / CLOCKS_PER_SEC;
-        printf("doin' dijkstra %d\n", j++);
-        start = clock();
         different_letters = calculateDifferentLetters(dictionary[length][origin_v], dictionary[length][final_v]);
         
+        /* If it's just a one letter change, or the two words are the same, then there's no point calling Dijkstra */
         if(different_letters == 1 || different_letters == 0)
             writefirstOutput(output, dictionary[length][origin_v], different_letters);
         else {
@@ -198,9 +188,6 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
             printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
         }
         
-        stop = clock();
-        spent2 += (double)(stop - start) / CLOCKS_PER_SEC;
-        
         writeOutput(output, dictionary[length][final_v]);
         fprintf(output, "\n");
         
@@ -208,7 +195,7 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         free(st);
     }
     
-    printf("spent1 = %lf secs, spent2 = %lf secs\n dont forget to remove the #include <time.h>\n", spent1, spent2);
+    return;
 }
 
 void freeAllGraphs(graph **all_graphs, int *size_array) {
@@ -233,7 +220,6 @@ void problemSolver(FILE *dic, FILE *prob, FILE *path) {
     initDictionary(prob, dic, dict, changed_letters, word_count);
     
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
-    printf("hi\n");
  
     initGraphs(all_graphs, changed_letters, word_count, dict);   
     solveAllProblems(prob, path, all_graphs, dict, word_count);

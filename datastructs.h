@@ -31,8 +31,8 @@ g_data * newGData(int weight, int vertex);
 graph * graphInit(int vert_num);
 int graphGetVert(graph *g);
 node ** graphGetAdj(graph *g);
-void insertVertex(graph *g, int index, Item data);
-void printGraph(graph *g);
+int getGraphVertex(Item info);
+int getGraphWeight(Item info);
 void freeGraph(graph *g, void (* freeItem)(Item));
 
 queue * queueInit(int size);
@@ -45,10 +45,7 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
 int emptyHeap(queue *q);
 void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2));
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2));
-int getGraphVertex(Item info);
-int getGraphWeight(Item info);
-Item removeMinHeap(queue *q, int (* compItem)(Item item1, Item item2));
-int findQueueV(queue *q, int original_qsize, int vertex);
+int findQueueV(queue *q, int vertex);
 int getQSize(queue *q);
 void freeHeap(queue *q);
 

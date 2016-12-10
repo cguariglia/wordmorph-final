@@ -1,5 +1,5 @@
 /* WORDMORPH - FINAL
- * Authors: Ana Carolina Lima & Carina Fernandes
+ * Authors: Ana Carolina Lima (83993) & Carina Fernandes (84019)
  * */
 
 #include <stdio.h>
@@ -12,10 +12,11 @@ int main(int argc, char **argv) {
 	FILE *fpdic, *fpprob, *fppath;
     char *filename;
 	
+    /* args: ./wordmorph .dic .pal */
 	if(argc != 3) 
 		exit(0);
 	
-	/* Verify file extensions and open Input files*/
+	/* Verify file extensions and open input files*/
 	fpdic = fcheck(argv[1], ".dic");
 	fpprob = fcheck(argv[2], ".pal");
   
@@ -24,6 +25,8 @@ int main(int argc, char **argv) {
   
     problemSolver(fpdic, fpprob, fppath);
 	
+    /* Close every file */
+    fclose(fppath);
     free(filename);
     fclose(fpdic);
 	fclose(fpprob);
