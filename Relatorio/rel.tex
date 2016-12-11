@@ -87,8 +87,6 @@
     \par Para evitar alocações de memória desnecessárias, percorrem-se todas as linhas do ficheiro de dicionário duas vezes. Uma para contar o número de palavras que existem de cada tamanho de palavra, outra para copiar as palavras do ficheiro para a matriz que representa o dicionário, cujo tamanho é alocado baseando-se no número obtido anteriormente. Assumiu-se que nunca existiriam palavras de mais de cem letras.
     \par Como mencionado na secção anterior, rapidamente chegou-se à conclusão de que é desnecessário criar grafos que não vão ser utilizados. Por isso, também percorre-se uma vez pelo ficheiro de problemas sem os começar a resolver, para saber que tamanhos de palavras existem no ficheiro, e qual número máximo de caracteres que mudam entre duas palavras do caminho.
     
-\subsection{Arquitectura do programa}
-    
 \subsection{Descrição das estruturas de dados}
     \par Como referido acima, foi claro que seria necessária a criação de uma lista de adjacências, então foi implementada uma lista genérica. Esta é definida usando void * (definido em datastructs.h, e a partir daqui referido como Item), para os quais se pode passar qualquer ponteiro, assegurando a generalidade da implementação.
     \par As listas definidas foram então utilizadas na definição do grafo pois este é implementado usando uma lista de adjacências. Os grafos foram definidos de forma genérica, com um reparo - a implementação dos dados usados na lista estão visíveis ao cliente. Todos os novos elementos desta lista são inseridos na primeira posição (head).
@@ -103,19 +101,34 @@
     \begin{description}[align=left]
         \item[Criação de grafo] Para inserir todas as palavras no grafo, é necessário comparar todas as palavras duas a duas. No código, como para cada palavra do dicionário só é necessário comparar as palavras anteriores a esta, o que acontece é $1 + 2 + 3 + ... + n = \frac{n^2}{2} + \frac{n}{2}$, que é majorado por $n^2$ concluindo-se então que a complexidade será $O(n^2)$.
         Em termos de memória, 
-        \item[Algorítmo de Dijkstra] O algorítmo de Dijkstra, usando uma heap, corre em $O(|e| + |n|log(|n|))$, assumindo que a procura de elementos dentro da heap é $O(1)$.
+        \item[Algorítmo de Dijkstra] O algorítmo de Dijkstra, usando uma heap, corre em $O(|e| + |n|log(|n|))$, em que $e$ é o número de ligações entre palavras e assumindo que a procura de elementos dentro da heap é $O(1)$.
     \end{description}
 
 \section{Análise do programa}
 
 \section{Exemplo}
     \par Considerando como exemplo um ficheiro de problemas com:
-        massa pasta 3
-        pasta pasta 1
-        pasta parte 2
-        …
-    \par E considerando que um dicionário um ficheiro com palavras não acentuadas, sem hífen, separadas por espaços ou \textit{newlines}, como por exemplo: 
-        Juiz, largo, …. .
+        \begin{center}
+        \texttt{massa pasta 3 \\
+        pasta pasta 1 \\
+        pasta parte 2 \\
+        }
+        \end{center}
+        
+    \par E considerando que um dicionário um ficheiro com palavras não acentuadas, sem hífen, separadas por espaços ou \textit{newlines} e que inclui todas as palavras que se encontram no ficheiro de problemas, como por exemplo: 
+        \begin{center}
+        \texttt{juiz largo \\
+        massa parte \\
+        pasta rei \\
+        ...}
+        \end{center}
+        
+    \par Então, os passos que se efectuam para resolver o ficheiro de problemas enunciado são:
+    
+    \begin{enumerate}[align=left]
+        \item Lê-se o ficheiro de problemas de forma a identificar o número máximo de mutações entre palavras de um determinado tamanho, ignorando casos triviais como duas palavras iguais ou duas palavras que apenas diferem em uma letra.
+        \item Guarda-se as palavras com tamanhos relevantes à resolução numa matriz.
+    \end{enumerate}
 
 \section{Bibliografia}
 
