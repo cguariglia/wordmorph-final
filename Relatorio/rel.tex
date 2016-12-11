@@ -90,7 +90,7 @@
 \subsection{Arquitectura do programa}
     
 \subsection{Descrição das estruturas de dados}
-    \par Como referido acima, era claro que seria necessária a criação de uma lista de adjacências, então foi implementada uma lista genérica. Esta é definida usando void * (definido em datastructs.h, e a partir daqui referido como Item), para os quais se pode passar qualquer ponteiro, assegurando a generalidade da implementação.
+    \par Como referido acima, foi claro que seria necessária a criação de uma lista de adjacências, então foi implementada uma lista genérica. Esta é definida usando void * (definido em datastructs.h, e a partir daqui referido como Item), para os quais se pode passar qualquer ponteiro, assegurando a generalidade da implementação.
     \par As listas definidas foram então utilizadas na definição do grafo pois este é implementado usando uma lista de adjacências. Os grafos foram definidos de forma genérica, com um reparo - a implementação dos dados usados na lista estão visíveis ao cliente. Todos os novos elementos desta lista são inseridos na primeira posição (head).
     \par Como terá de existir um grafo para cada tamanho de palavras, decidiu-se usar um vetor para guardá-los no qual o índice corresponde ao tamanho das palavras representadas no grafo (i.e. all{\_}arrays[3] contêm o grafo das palavras de tamanho 3).
     \par Por fim, a descrição do algorítmo de Dijkstra requer um acervo, também este definida de forma genérica no código. Neste caso, o acervo foi implementado usando uma fila prioritária, que por sua vez foi implementada usando um vector. Este vector tem um tamanho fixo, definido na sua incialização, mas usou-se outra vaŕiavel (q$\rightarrow$first) para que exista um "vector virtual"  dentro do vector maior. Outra das variáveis que foi útil foi um vector indexado por vértices que diz onde o vértice está na heap (q$\rightarrow$vert{\_}pos), que evita que se tenha de fazer procura linear cada vez que se quer encontrar um vértice na heap.
@@ -102,12 +102,20 @@
     \par Examinando o programa, chega-se à conclusão de que existem duas grandes partes no problema. Em ambos os casos, $n$ representa o número total de palavras com o mesmo tamanho.
     \begin{description}[align=left]
         \item[Criação de grafo] Para inserir todas as palavras no grafo, é necessário comparar todas as palavras duas a duas. No código, como para cada palavra do dicionário só é necessário comparar as palavras anteriores a esta, o que acontece é $1 + 2 + 3 + ... + n = \frac{n^2}{2} + \frac{n}{2}$, que é majorado por $n^2$ concluindo-se então que a complexidade será $O(n^2)$.
-        \item[Algorítmo de Dijkstra]  
+        Em termos de memória, 
+        \item[Algorítmo de Dijkstra] O algorítmo de Dijkstra, usando uma heap, corre em $O(|e| + |n|log(|n|))$, assumindo que a procura de elementos dentro da heap é $O(1)$.
     \end{description}
 
 \section{Análise do programa}
 
 \section{Exemplo}
+    \par Considerando como exemplo um ficheiro de problemas com:
+        massa pasta 3
+        pasta pasta 1
+        pasta parte 2
+        …
+    \par E considerando que um dicionário um ficheiro com palavras não acentuadas, sem hífen, separadas por espaços ou \textit{newlines}, como por exemplo: 
+        Juiz, largo, …. .
 
 \section{Bibliografia}
 

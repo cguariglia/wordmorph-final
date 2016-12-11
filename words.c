@@ -17,8 +17,9 @@ void problemCounter(FILE *prob, int *problem_array) {
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
         diff = calculateDifferentLetters(aux1, aux2, -2);
-       if(diff == 1 || diff == 0)
-            continue; 
+        if(diff == 1 || diff == 0)
+            continue;
+            
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }
@@ -98,8 +99,7 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
             for(j = 0; j < size_array[i]; j++) {
                 for(n = 0; n < j; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n], max_change[i]);
-					if(word_weight > 0 /*&& word_weight <= max_change[i]*/) {                              
-
+					if(word_weight > 0) {                              
                         weight = word_weight * word_weight;
                         adj_list[j] = insertList(adj_list[j], newGData(weight, n));
                         adj_list[n] = insertList(adj_list[n], newGData(weight, j));
@@ -163,14 +163,12 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
         length = strlen(aux1);
 
 	    different_letters = calculateDifferentLetters(aux1, aux2, -2);
-		if( different_letters == 1 || different_letters == 0 ){
-			 writefirstOutput(output, aux1, different_letters);
-			 
-			 if( different_letters!= 0 )  
-				writeOutput(output, aux2);
-			fprintf(output, "\n"); 
+        /* If it's just a one letter change, or the two words are the same, then there's no point calling Dijkstra */
+		if(different_letters == 1 || different_letters == 0) { 
+            writefirstOutput(output, aux1, different_letters);
+            writeOutput(output, aux2);
 		}	
-		else{
+		else {
 			
 			/* Finding the words in the dictionary */
 			for(i = 0; i < size_array[strlen(aux1)]; i++) {
@@ -179,9 +177,8 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 				if(strcmp(aux2, dictionary[length][i]) == 0)
 					final_v = i;
 			}
-			
-			 /* If it's just a one letter change, or the two words are the same, then there's no point calling Dijkstra */
-				verts = graphGetVert(all_graphs[length]);
+            
+                verts = graphGetVert(all_graphs[length]);
 				wt = (int *)allocate(verts * sizeof(int));
 				st = (int *)allocate(verts * sizeof(int));
 			
@@ -194,8 +191,8 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 				free(st);
 				
 				writeOutput(output, dictionary[length][final_v]);
-				fprintf(output, "\n");
 		}
+        fprintf(output, "\n");
        
     }
     

@@ -48,26 +48,17 @@ char* outputFileExtension(char * name_input){
 	return name_output;
 }
 
-/* Returns how many different letters there are in two words */
-/*int calculateDifferentLetters(char *word1, char *word2) {
-    int i, different_letters = 0;
-    
-    for(i = 0; i < strlen(word1); i++)
-        if(word1[i] != word2[i])
-            different_letters += 1;
-    
-    return different_letters;
-}*/
-
+/* Returns how many letters differ between two words */
 int calculateDifferentLetters(char *word1, char *word2, int cost) {
     int i, different_letters = 0;
     
     for(i = 0; i < strlen(word1); i++){
         if(word1[i] != word2[i])
             different_letters += 1;
-        if((different_letters > cost) && (cost!=-2) ) return -1;  /*Se o numero diferente de caracteres for maior que o custo maximo para 
-        esse tamanho nao vale a pena continuar neste ciclo. Return -1 if that happens.  Makes shit faster */
-        /*Also quando esta funcao nao estiver a ser utilizada para meter na lista de adj por o custo a -2 evitando o break */
+            
+        if((different_letters > cost) && (cost != -2) ) return -1;  /* Se o numero diferente de caracteres for maior que o custo maximo para 
+        esse tamanho nao vale a pena continuar neste ciclo. */
+        /* Also quando esta funcao nao estiver a ser utilizada para meter na lista de adj por o custo a -2 evitando o break */
     } 
 
     
