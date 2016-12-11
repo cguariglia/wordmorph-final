@@ -18,18 +18,21 @@ struct graph {
 
 struct queue {
     int size;
-    int first; /* As in first empty spot in the queue */
+    int first; /* First empty spot in the queue */
     int *vert_pos; /* An array indexed with the vertexes that tells you where the vertex is in the heap. Makes search much faster. */
     Item *data;
 };
 
 /* Linked list definitions: */
 
+/* Initialize single linked list*/
 node * initLinkedList() {
     return NULL;
 }
 
 /* Given data and the next node, makes a new node */
+
+/* Creates a new node, inputs data in it and puts that node pointing to the next node according to the input */
 node * newNode(Item data, node *next) {
     node *new;
     
@@ -49,12 +52,12 @@ node * changeNodeData(node *old, Item new_data) {
     return old;
 }
 
-/* Returns the node following cur */
+/* Returns pointer to the node following cur */
 node * nextNode(node *cur) {
     return cur->next;
 }
 
-/* Returns cur's data */
+/* Returns the data of a node in the implemented single linked list */
 Item getData(node *cur) {
     if(cur == NULL)
         exit(0);
@@ -62,8 +65,7 @@ Item getData(node *cur) {
         return cur->data;
 }
 
-/* Inserts node in the beginning of the list 
- * compFunc must return < 0 if the first item is smaller than the next, = 0 if it's the same and > 0 if it's bigger */
+/* Inserts node in the beginning of the single linked list  */
 node * insertList(node *first, Item item) {
 	node *new_node;
     
@@ -78,7 +80,7 @@ node * insertList(node *first, Item item) {
 	return first;
 }
 
-/* Iterates through the linked list, freeing every node in the meantime */
+/* Iterates through the linked list, freeing every node  */
 void freeLinkedList(node *head, void (* freeItem)(Item)) {
     node *next, *aux;
     
@@ -91,7 +93,7 @@ void freeLinkedList(node *head, void (* freeItem)(Item)) {
     return;
 }
 
-/* Creates a new g_data, so there's always a "new" pointer */
+/* Creates a new g_data */
 g_data * newGData(int weight, int vertex) {
     g_data *new;
     
@@ -108,7 +110,7 @@ g_data * newGData(int weight, int vertex) {
 
 /* Graph (using adjacency lists) definitions: */
 
-/* Initializes graph, given the number of vertices on it. The graph starts with no edges, obviously. */
+/* Initializes graph, given the number of vertices on it. */
 graph * graphInit(int vert_num) {
     graph *g;
     int i;
@@ -129,22 +131,27 @@ graph * graphInit(int vert_num) {
     return g;
 }
 
+/* Get the number of vertices in a graph */
 int graphGetVert(graph *g) {
     return g->vertices;
 }
 
+/* Get the array of linked lists of a graph */
 node ** graphGetAdj(graph *g) {
     return g->adj;
 }
 
+ 
 int getGraphVertex(Item info) {
 	return ((g_data *)info)->vertex;
 }
+
+ 
 int getGraphWeight(Item info) {
 	return ((g_data *)info)->weight;
 }
 
-/* Frees the graph (including it's adjacency list */
+/* Frees the graph and it's adjacency lists */
 void freeGraph(graph *g, void (* freeItem)(Item)) {
     int i;
     
@@ -186,6 +193,7 @@ queue * queueInit(int size) {
     return q;
 }
 
+/* Get the heap array*/
 Item * queueGetData(queue *q) {
     return q->data;
 }
@@ -198,11 +206,12 @@ void changeQueueData(queue *q, int idx, Item new_value) {
     return;
 }
 
-/* Checks if the heap is empty or not */
+/* Checks if the heap is empty or not. */
 int emptyHeap(queue *q) {	
      return (q->first == 0);
 }
 
+/* Inserts data in a position of the heap and reinstates heap condition. */
 void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2)) {
     
     if(q->first + 1 <= q->size) {
@@ -217,7 +226,7 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
     return;
 }
 
-/* Repõe a condição de heap */
+/* Reinstates heap conditionp */
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
          
@@ -235,7 +244,7 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
     return;
 }
 
-/* Repõe a condição de heap */
+/* Reinstate heap condition*/
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     int child;
@@ -264,18 +273,12 @@ void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2))
     return;
 }
 
-/* Lowers something's priority and then fixes the heap afterwards. */
-void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2)) {
-    lowerPriority(q, idx, n_p);
-    fixUp(q, idx, compItem);
-    return;
-}
-
 /* Finds the index in which a specific vertex is located */
 int findQueueV(queue *q, int vertex){
 	return q->vert_pos[vertex];
 }
 
+/* Get maximum size of heap*/
 int getQSize(queue *q) {
     return q->size;
 }

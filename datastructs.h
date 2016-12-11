@@ -43,7 +43,6 @@ void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2))
 void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2));
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2));
 int emptyHeap(queue *q);
-void fixLowerPriority(queue *q, int idx, Item n_p, void (* lowerPriority)(queue *q, int idx, Item new_priority), int (* compItem)(Item item1, Item item2));
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2));
 int findQueueV(queue *q, int vertex);
 int getQSize(queue *q);

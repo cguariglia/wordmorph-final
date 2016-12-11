@@ -10,7 +10,7 @@ void * allocate(size_t);
 FILE * fcheck(char *, char *);
 char* outputFileExtension(char * name_input);
 
-int calculateDifferentLetters(char *word1, char *word2);
+int calculateDifferentLetters(char *word1, char *word2, int cost);
 int compInts(Item i1, Item i2);
 int compWeight(Item item1, Item item2);
 

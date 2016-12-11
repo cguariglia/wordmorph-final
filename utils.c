@@ -49,7 +49,7 @@ char* outputFileExtension(char * name_input){
 }
 
 /* Returns how many different letters there are in two words */
-int calculateDifferentLetters(char *word1, char *word2) {
+/*int calculateDifferentLetters(char *word1, char *word2) {
     int i, different_letters = 0;
     
     for(i = 0; i < strlen(word1); i++)
@@ -57,7 +57,23 @@ int calculateDifferentLetters(char *word1, char *word2) {
             different_letters += 1;
     
     return different_letters;
+}*/
+
+int calculateDifferentLetters(char *word1, char *word2, int cost) {
+    int i, different_letters = 0;
+    
+    for(i = 0; i < strlen(word1); i++){
+        if(word1[i] != word2[i])
+            different_letters += 1;
+        if((different_letters > cost) && (cost!=-2) ) return -1;  /*Se o numero diferente de caracteres for maior que o custo maximo para 
+        esse tamanho nao vale a pena continuar neste ciclo. Return -1 if that happens.  Makes shit faster */
+        /*Also quando esta funcao nao estiver a ser utilizada para meter na lista de adj por o custo a -2 evitando o break */
+    } 
+
+    
+    return different_letters;
 }
+
 
 int compInts(Item i1, Item i2) {
     int *num1 = i1;
@@ -141,6 +157,7 @@ void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
                           
                 /* aux_w <= max_step because that depends on the problem - we can't go through a connection that's bigger than allowed */
 				if(aux_w <= max_step && wt[w] > (wt[help_w->vertex] + aux_w)) {
+					
 					wt[w] = (wt[help_w->vertex] + aux_w);
 					
                     h_pos = findQueueV(q, w); /* Encontrar pos da heap com o vrtice w para lhe alterar o peso */
