@@ -7,7 +7,7 @@
 /* In this file:
  * Functions that are directly linked to solving the given problem. */
 
-/* Check which graphs need to be built based upon the problem file. Also max weight */
+/* Check which graphs need to be built based on the problem file. Determine max mutation weight for each relevant word size */
 void problemCounter(FILE *prob, int *problem_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
 	int max_change, i, diff;
@@ -17,18 +17,19 @@ void problemCounter(FILE *prob, int *problem_array) {
 	
 	while(fscanf(prob, "%s %s %d", aux1, aux2, &max_change) == 3) {
         diff = calculateDifferentLetters(aux1, aux2, -2);
-        if(diff == 1 || diff == 0)
-            continue;
+        if(diff == 1 || diff == 0) 
+            continue; /* These cases can be solved directuly without the need of a graph */
             
         if(max_change > problem_array[strlen(aux1)])
 		    problem_array[strlen(aux1)] = max_change; /* This array determines which graphs actually get built */
     }
 	
-    rewind(prob); /* We're going to use it later, so might as well bring it back to the beginning now. */
+   /* rewind(prob);  [we rewind in solveall probl ]-  We're going to use it later, so might as well bring it back to the beginning now. */
 
 	return;	
 }
 
+/* Counts the number of occurrences in the .dic file of each word size relevant to solving the problems */
 void wordCounter(FILE *input, int *occurrences, int *problems) {
 	int i;
 	char word[MAX_STRING];
@@ -38,20 +39,20 @@ void wordCounter(FILE *input, int *occurrences, int *problems) {
 		
 	while(fscanf(input, "%s", word) == 1) { 
 		if(problems[strlen(word)] > 0) /* If the problem file involves a word of that size */
-			occurrences[strlen(word)] += 1; 		
+			occurrences[strlen(word)] += 1;  
 	}
 
 	return;
 }
 
-/* Copies word from file to 3D matrix and sorts individual arrays */
+/* Copies word from .dic to a 3D Matrix, to the respective individual array */
 void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	char word[MAX_STRING];
 	int index, i, length;
 
 	int aux_array[MAX_STRING];
     
-	/* Allocates each segment of the array depending on how many words of that length there are.*/
+	/* Allocates each segment of the array depending on how many words of that length there are */
 	for(i = 0; i < MAX_STRING; i++) {
 		if(size_array[i] != 0) {
 			output[i] = (char **)allocate(sizeof(char *) * size_array[i]);
@@ -59,7 +60,7 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 		}
 	}
     
-    rewind(input);
+    rewind(input);  /* Since we already went through the dictionary file in wordCounter, rewind the FILE pointer */
 	
 	while(fscanf(input, "%s", word) == 1) {
 		length = strlen(word);
@@ -77,25 +78,28 @@ void wordReader(FILE *input, char **output[MAX_STRING], int *size_array) {
 	return;
 }
 
-/* Checks which word lists to build, counts the overall number of words and then actually copies the words to the matrix */
+/* Check which word sizes are relevant in the problem file, count number of occurences of that size and create Dictionary Matrix */
 void initDictionary(FILE *prob, FILE *dic, char **dictionary[MAX_STRING], int *to_solve, int *word_count) {
 
 	problemCounter(prob, to_solve);	              
-	wordCounter(dic, word_count, to_solve);   /* Pir algum motivo daqui para aqui ele mexe no vetor do word_count*/  		
+	wordCounter(dic, word_count, to_solve);   	
 	wordReader(dic, dictionary, word_count);
     
 	return;
 }
 
+/* Create the necessary graphs */
 void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***dict) {
     int i, j, n, word_weight, weight;
     node **adj_list;
     
     for(i = 0; i < MAX_STRING; i++) {
+		/* For every relevant word size */
         if(max_change[i] > 0) {	 
             all_graphs[i] = graphInit(size_array[i]);
             adj_list = graphGetAdj(all_graphs[i]);
-            /* Actually build the adj list for each word of i letters, comparing the words with indexes j and n*/
+            
+            /* Build the adj list for each word with i letters, comparing the words in the Dictionary Matrix with indexes j and n */
             for(j = 0; j < size_array[i]; j++) {
                 for(n = 0; n < j; n++) {
                     word_weight = calculateDifferentLetters(dict[i][j], dict[i][n], max_change[i]);
@@ -112,8 +116,7 @@ void initGraphs(graph **all_graphs, int *max_change, int *size_array, char ***di
     return;
 }
 
-
-
+/* Print path to .path file recursively */
 void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, char **dic[MAX_STRING], int cur) {
     
     /* Retrace path to origin vertex */
@@ -127,14 +130,16 @@ void printPath(FILE *output, int w_size, int *st, int origin_v, int final_v, cha
     return;
 }
 
+/* Calculate the cost associated with a path obtained from dijkstra */
 int calculateTotalCost(int *st, int final_v, char **dic) {
     int total_cost = 0;
     int non_squared_weight;
     
-    /* Goes through the path until the end, calculating the weight in the meantime */
-    if(st[final_v] == -1)
+  
+    if(st[final_v] == -1) /* If there is no path */
         return -1;
-    
+  
+    /* Goes through the path until the end, calculating the weight in the meantime */  
     while(st[final_v] != -1) {
         non_squared_weight = calculateDifferentLetters(dic[final_v], dic[st[final_v]], -2);
         total_cost += non_squared_weight * non_squared_weight;
@@ -145,32 +150,30 @@ int calculateTotalCost(int *st, int final_v, char **dic) {
 }
 
 
+
+/* Second read of the problems file in which the problems are actually solved and their solutions written to the output file */
 void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dictionary[MAX_STRING], int *size_array) {
 	char aux1[MAX_STRING], aux2[MAX_STRING];
-	int cost = 0, length = 0, i, verts, origin_v = 0, final_v = 0, different_letters = 0;
+	int cost = 0, length = 0, i, verts = 0, origin_v = 0, final_v = 0, different_letters = 0;
     int *wt, *st;
+	  
+    rewind(input);  /* Since we already went through the problems file in problemCounter rewind the FILE pointer */
 	
-    /* Dado os elementos de um grafo - ver qual e o vertice origem - palavra do ficheiro de prob e o seu n de vertice no grafo */
-	/* Com base nessa valor do vertice - correr o dijkstra que gera o caminho */
-	/* Imprimir no ficheiro de saida as palavras do caminho com base nos valores no vetor s */
-
-    /* Para cada problema: */ 
-    
-    rewind(input); /* Since we already went through the problems file before */
-	
-
+	/* For each problem in the problem file */
 	while(fscanf(input, "%s %s %d", aux1, aux2, &cost) == 3) {
+       
         length = strlen(aux1);
 
 	    different_letters = calculateDifferentLetters(aux1, aux2, -2);
-        /* If it's just a one letter change, or the two words are the same, then there's no point calling Dijkstra */
+	    
+        /* If the problem involves words with just a one letter difference, or only the same word, then the solution is imediate */
 		if(different_letters == 1 || different_letters == 0) { 
             writefirstOutput(output, aux1, different_letters);
             writeOutput(output, aux2);
 		}	
-		else {
-			
-			/* Finding the words in the dictionary */
+		else { 
+				
+			/* Finding the problem words in the Dictionary Matrix */
 			for(i = 0; i < size_array[strlen(aux1)]; i++) {
 				if(strcmp(aux1, dictionary[length][i]) == 0)
 					origin_v = i;
@@ -178,27 +181,30 @@ void solveAllProblems(FILE *input, FILE *output, graph **all_graphs, char **dict
 					final_v = i;
 			}
             
-                verts = graphGetVert(all_graphs[length]);
-				wt = (int *)allocate(verts * sizeof(int));
-				st = (int *)allocate(verts * sizeof(int));
+            verts = graphGetVert(all_graphs[length]);
+			wt = (int *)allocate(verts * sizeof(int));
+			st = (int *)allocate(verts * sizeof(int));
 			
-				dijkstra(all_graphs[length], origin_v, final_v, cost * cost, st, wt);
+			/* Find the shortest path between the two problem words */
+			dijkstra(all_graphs[length], origin_v, final_v, cost * cost, st, wt);
 				
-				/* To ensure correct output */
-				writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length]));
-				printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
-				free(wt);
-				free(st);
+			/* Write solution with the respective cost in the Outputfile */
+			writefirstOutput(output, dictionary[length][origin_v], calculateTotalCost(st, final_v, dictionary[length]));
+			printPath(output, length, st, origin_v, final_v, dictionary, st[final_v]);
+			
+			free(wt);
+			free(st);
 				
-				writeOutput(output, dictionary[length][final_v]);
+			writeOutput(output, dictionary[length][final_v]);
 		}
+		
         fprintf(output, "\n");
-       
     }
     
     return;
 }
 
+/* Free each existing graph as well as the graph array containing all of them */
 void freeAllGraphs(graph **all_graphs, int *size_array) {
     int i;
     
@@ -211,24 +217,28 @@ void freeAllGraphs(graph **all_graphs, int *size_array) {
     return;
 }
 
-/* Second read of the problems file, in which the problems are actually solved and written to the output file.
- * Basically the main function of the whole program. */
+
+/* Basically the main function of the whole program */
 void problemSolver(FILE *dic, FILE *prob, FILE *path) {
     char **dict[MAX_STRING];
 	int changed_letters[MAX_STRING], word_count[MAX_STRING]; 
     graph **all_graphs;
 
+	/* Create Dictionary Matrix */
     initDictionary(prob, dic, dict, changed_letters, word_count);
 
+    /* Allocate memory for an array of graphs */
     all_graphs = (graph **)allocate(sizeof(graph *) * MAX_STRING);
     
     initGraphs(all_graphs, changed_letters, word_count, dict);   
 	
+	/* Solve the problems in the problem file and write their respective solution to an output file */
     solveAllProblems(prob, path, all_graphs, dict, word_count);
-    
+     
     freeAllGraphs(all_graphs, word_count);
     freeMatrix(dict, word_count, MAX_STRING);
     
     return;
 }
+
 

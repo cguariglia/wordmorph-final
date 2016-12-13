@@ -56,12 +56,11 @@ int calculateDifferentLetters(char *word1, char *word2, int cost) {
         if(word1[i] != word2[i])
             different_letters += 1;
             
-        if((different_letters > cost) && (cost != -2) ) return -1;  /* Se o numero diferente de caracteres for maior que o custo maximo para 
-        esse tamanho nao vale a pena continuar neste ciclo. */
-        /* Also quando esta funcao nao estiver a ser utilizada para meter na lista de adj por o custo a -2 evitando o break */
+        if((different_letters > cost) && (cost != -2) ) return -1; /* When this function is used to determine insertion in adj list 
+        when the number of different letters is bigger than the maximum cost return value < 0 */
+        
+        /* When this function is used in any other context, the cost has the value - 2 */
     } 
-
-    
     return different_letters;
 }
 
@@ -80,8 +79,8 @@ int compInts(Item i1, Item i2) {
     return 0;
 }
 
-/* Given two g_datas, compares their weights.
- * Obviously the Items/void * NEED to be g_datas. */
+/* Given two g_datas, compares their weights
+ * Obviously the Items/void * need to be g_datas */
 int compWeight(Item i1, Item i2) {
     g_data *item1 = i1;
     g_data *item2 = i2;
@@ -96,15 +95,6 @@ int compWeight(Item i1, Item i2) {
     return 0;
 }
 
-/* Lowers something's priority (in this case, by lowering its weight */
-void lowerWeight(queue *q, int idx, Item new_weight) {
-    g_data _data = {0, 0};
-    g_data *data = &_data;
-    
-    changeQueueData(q, idx, data);
-    return;
-}
-
 void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
     int w, vertex, verts, aux_w, h_pos;
     queue *q;
@@ -113,22 +103,23 @@ void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
     g_data _change_data = {0, 0};
 	g_data *aux, *help_w, *change_data = &_change_data;
 
-    /* Inicializar a queue / heap com todos os pesos no maximo */
+    /* Init Heap with two arrays with same size as the number of vertices in the graph */
     verts = graphGetVert(g); 
 	q = queueInit(verts);
     
+    /* Init weight of vertices in the heap and wt with MAX_WT and st with -1 */
     for(vertex = 0; vertex < verts; vertex++) {
 		st[vertex] = -1;
 		wt[vertex] = MAX_WT;
 		insertInHeap(q, newGData(MAX_WT, vertex), compWeight);
 	}
-    
-    /* Por a prioridade do ponto de partida a 0 */
+   
+	/* Change weight of origin vertex in wt to 0 */
 	wt[s] = 0;
     change_data->vertex = s;
     change_data->weight = 0;
-	changeQueueData(q, s, change_data); /* Mudar o peso do vertice s no vetor da queue*/
-	fixUp(q, s, compWeight);        
+	changeQueueData(q, s, change_data); /* Change weight of origin vertex in heap to 0 */
+	fixUp(q, s, compWeight); /* Reinstate heap condition */
 
 	while(!emptyHeap(q)) {
         help_w = (g_data *)removeHeap(q, compWeight);
@@ -138,7 +129,7 @@ void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
             break;
         }
         
-        if(wt[help_w->vertex] != MAX_WT) { /* If there's a path to the node */
+        if(wt[help_w->vertex] != MAX_WT) { /* If there is a path to the node */
             aux_adj = graphGetAdj(g); 
             
 			for(t = aux_adj[help_w->vertex]; t != NULL; t = nextNode(t)) {
@@ -146,15 +137,15 @@ void dijkstra(graph *g, int s, int end, int max_step, int *st, int *wt) {
                 w = aux->vertex;
                 aux_w = aux->weight;
                           
-                /* aux_w <= max_step because that depends on the problem - we can't go through a connection that's bigger than allowed */
+                /* aux_w <= max_step because max_step depends on the problem - we can't go through a connection that's bigger than allowed */
 				if(aux_w <= max_step && wt[w] > (wt[help_w->vertex] + aux_w)) {
 					
 					wt[w] = (wt[help_w->vertex] + aux_w);
 					
-                    h_pos = findQueueV(q, w); /* Encontrar pos da heap com o vrtice w para lhe alterar o peso */
+                    h_pos = findQueueV(q, w);
                     change_data->vertex = w;
                     change_data->weight = wt[w];
-                    changeQueueData(q, h_pos, change_data);
+                    changeQueueData(q, h_pos, change_data); /* Change weight of vertex w in heap */
                     fixUp(q, h_pos, compWeight);
                     
 					st[w] = help_w->vertex;
@@ -180,12 +171,12 @@ void writeOutput(FILE * fp, char * word) {
     return;
 }
 
-/* Frees a whole matrix (but the size must be passed as an array) */
+/* Frees a Matrix, being the second dimension size passed as an array */
 void freeMatrix(char ***mat, int *size, int init_size) {
 	int i, j;
 	
 	for(i = 0; i < init_size; i++) {
-		for(j = 0; j < size[i]; j++)
+		for(j = 0; j < size[i]; j++)  
 			free(mat[i][j]);
 		if(size[i] != 0)
 			free(mat[i]);

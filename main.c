@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   
     problemSolver(fpdic, fpprob, fppath);
 	
-    /* Close every file */
+    /* Close files */
     fclose(fppath);
     free(filename);
     fclose(fpdic);
@@ -33,6 +33,4 @@ int main(int argc, char **argv) {
  
 	return 0;
 }
-
-
 

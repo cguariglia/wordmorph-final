@@ -193,7 +193,7 @@ queue * queueInit(int size) {
     return q;
 }
 
-/* Get the heap array*/
+/* Get the heap data array*/
 Item * queueGetData(queue *q) {
     return q->data;
 }
@@ -244,7 +244,7 @@ void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) {
     return;
 }
 
-/* Reinstate heap condition*/
+/* Reinstates heap condition*/
 void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     int child;
@@ -283,12 +283,12 @@ int getQSize(queue *q) {
     return q->size;
 }
 
-/* Remove o item mais pequeno da heap, voltando a repor a condição de heap de seguida */
+/* Removes item with lower weight from the heap, reinstating the heap condition afterwards */
 Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	Item aux;
     
-    /* Estamos a criar uma arvore binaria, logo tira se da raiz que e mais facil e assim tem se a certeza de que e o com menor peso */
-	aux = q->data[0]; /* Remove item at root of heap */
+    /* Remove item at the root of the heap */
+    aux = q->data[0]; 
 	q->data[0] = q->data[q->first - 1];	/* Put the last value in the array at the root of the heap */
 
 	--(q->first); /* Update heap properties */
@@ -297,7 +297,7 @@ Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2)) {
 	return aux;
 }
 
-/* Faz free da heap e de todos os seus componentes */
+/* Free Heap and all it's components */
 void freeHeap(queue *q) {
     int i;
     
