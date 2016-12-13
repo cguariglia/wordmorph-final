@@ -1,0 +1,15 @@
+\select@language {portuguese}
+\contentsline {section}{\numberline {1}Descri\IeC {\c c}\IeC {\~a}o do problema}{3}
+\contentsline {section}{\numberline {2}Abordagem do problema}{3}
+\contentsline {subsection}{\numberline {2.1}Procura do caminho de menor custo}{3}
+\contentsline {section}{\numberline {3}Implementa\IeC {\c c}\IeC {\~a}o do programa}{3}
+\contentsline {subsection}{\numberline {3.1}Descri\IeC {\c c}\IeC {\~a}o das estruturas de dados}{5}
+\contentsline {subsection}{\numberline {3.2}Descri\IeC {\c c}\IeC {\~a}o dos algoritmos utilizados}{5}
+\contentsline {section}{\numberline {4}Subsistemas funcionais}{6}
+\contentsline {subsection}{\numberline {4.1}datastructs.c}{6}
+\contentsline {subsection}{\numberline {4.2}utils.c}{6}
+\contentsline {subsection}{\numberline {4.3}words.c}{7}
+\contentsline {section}{\numberline {5}Complexidade do programa}{8}
+\contentsline {section}{\numberline {6}An\IeC {\'a}lise do programa}{8}
+\contentsline {section}{\numberline {7}Exemplo}{8}
+\contentsline {section}{\numberline {8}Bibliografia}{11}
