@@ -18,6 +18,7 @@
 \usepackage{color}
 \usepackage{imakeidx}
 \usepackage{array}
+\usepackage{placeins}
 \usepackage{enumitem}
 \usepackage{multirow}
 \newcommand\showdiv[1]{\overline{\smash{\hstretch{.5}{)}\mkern-3.2mu\hstretch{.5}{)}}#1}}
@@ -60,58 +61,182 @@
     \par O objectivo final deste projecto é, dado duas palavras e o número máximo de trocas que se podem efectuar em cada passo, retornar o caminho de menor custo entre essas duas palavras.
     
 \section{Abordagem do problema}
-    \par Para resolver o problema, decidiu-se dividi-lo nas seguintes partes: guardar as palavras do dicionário e procurar o caminho propriamente dito. Chegou-se então à conclusão de que seria necessário guardar as palavras do dicionário num local que fosse facilmente acessível, e que não seria necessário guardar todas as palavras, apenas as relevantes, tal como não é necessário fazer todos os grafos.
+    \par Para resolver o problema, decidiu-se dividi-lo nas seguintes partes: guardar as palavras do dicionário e procurar o caminho propriamente dito. Após uma análise do pedido e das ferramentas disponíveis para o resolver, chegou-se então à conclusão de que seria necessário guardar as palavras do dicionário numa estrutura de dados que fosse facilmente acessível, e que não seria necessário guardar todas as palavras do mesmo, apenas as relevantes à resolução do problema. Analogamente se concluiu que não seria necessário criar todos os grafos nem representar nestes todas as palavras de um determinado tamanho.
+
 \subsection{Procura do caminho de menor custo}
-    \par A escolha óbvia para resolver este problema foi recorrer ao algorítmo de Dijkstra, que procura o caminho mais curto entre dois vértices de um dado grafo desde que nenhuma das arestas do mesmo tenha peso negativo, o que é o caso deste problema. Para podermos utilizar então o algorítmo, chegou-se então à conclusão que é necessária a criação de um grafo representado por listas de adjacências (o algorítmo não é igual para matrizes de adjacência).
+    \par A escolha óbvia para resolver este problema foi recorrer ao algoritmo de Dijkstra, que procura o caminho mais curto entre dois vértices de um dado grafo desde que nenhuma das arestas do mesmo tenha peso negativo, o que é o caso deste problema. Para podermos utilizar então o algoritmo, chegou-se então à conclusão que é necessária a criação de um grafo representado por listas de adjacências (o algoritmo não é igual para matrizes de adjacência).
+    \par A utilização deste algoritmo também pressupunha a construção de um acervo e das funções necessárias à sua manipulação. 
+    \par Tal como é mais tarde enunciado, foram sendo realizadas otimizações e alterações ao longo da elaboração deste projeto tendo esta contudo partindo do acima descrito.
+      
     
 \section{Implementação do programa}
-    \par Dividiu-se então o programa em três partes distintas: uma parte referente às estruturas de dados, uma parte que se relaciona diretamente com o problema a resolver, e por fim todas as restantes operações que não pertencem a nenhum dos anteriores grupos. No código, estas partes equivalem aos ficheiros datastructs.c, words.c e utils.c respectivamente.
-    \par Para evitar alocações de memória desnecessárias, percorrem-se todas as linhas do ficheiro de dicionário duas vezes. Uma para contar o número de palavras que existem de cada tamanho de palavra, outra para copiar as palavras do ficheiro para a matriz que representa o dicionário, cujo tamanho é alocado baseando-se no número obtido anteriormente. Assumiu-se que nunca existiriam palavras de mais de cem letras.
-    \par Como mencionado na secção anterior, rapidamente chegou-se à conclusão de que é desnecessário criar grafos que não vão ser utilizados. Por isso, também percorre-se uma vez pelo ficheiro de problemas sem os começar a resolver, para saber que tamanhos de palavras existem no ficheiro, e qual número máximo de caracteres que mudam entre duas palavras do caminho.
-    \par Assim, decidiu-se estruturar o programa como esquematizado no fluxograma da figura \ref{fig:flux1}.
-    
-    \begin{figure}
-        \includegraphics[width=\linewidth]{fluxograma1.png}
-        \caption{Fluxograma da função problemSolver}
+    \par A resolução do problema foi concretizada através da elaboração do programa cujo fluxograma se encontra representado na Figura 1.
+
+  \begin{figure}
+        \includegraphics[width=\linewidth]{main.png}
+        \caption{Fluxograma da função main do programa desenvolvido.}
         \label{fig:flux1}
     \end{figure}
+    
+   
+     \par O programa implementado foi dividido em três módulos diferentes, um dedicado às estruturas de dados e às operações sobre elas realizadas, o equivalente ao ficheiro datastructs.c, um que se relaciona diretamente com o problema a resolver, ou seja o ficheiro words.c, e por fim um com todas as restantes funções que não se inseriam em nenhum dos anteriores grupos referidos, o ficheiro utils.c. 
+      Tal como pode ser observado na figura acima, a resolução do problema é realizada na função $problemSolver$, que se encontra no ficheiro words.c, sendo esta constituída por uma série de funções que dividem a resolução do problema em várias tarefas mais específicas que facilitam à compreessão do racíocínio aplicado. 
+      \par Isto é evidente na Figura \ref{fig:flux2}, onde se encontra representado o fluxograma desta mesma função.
+   
+    \begin{figure}
+        \includegraphics[width=\linewidth]{fluxograma1.png}
+        \caption{Fluxograma da função problemSolver.}
+        \label{fig:flux2}
+    \end{figure}
+    
+    
+    \par Esta função e as primeiras três funções suas constituintes estão disponíveis no ficheiro words.c visto estarem dedicadas diretamente à resolução do problema em questão. Considerando em primeiro lugar a função $initDictionary$, é logo possível inferir pelo nome que se trata de uma função relacionada com a construção do dicionário usado ao longo do programa.
+    \par De facto esta função é constituída por três funções, também estas no ficheiro words.c, que permitem a construção e preenchimento de uma matriz dicionário que contém para cada tamanho de palavra cujo problema implica a criação de um grafo, as palavras presentes no ficheiro .dic desse mesmo tamanho.
+    \par De seguida, na função $problemSolver$ é abordada a necessidade da criação de grafos, sendo alocada memória para um vector de grafos que irá conter todos os utilizados durante o programa, sendo estes criados e preenchidos, caso sejam necessários, na função seguinte, $initGraphs$. Nesta função, para cada tamanho de palavra relevente, isto é, para cada tamanho cujos problemas não podem ser resolvidos diretamente, será criado um grafo implementado com listas de adjacência.
+    \par É de notar que serão colocadas na lista de adjacência de cada palavra apenas aquelas que diferem desta um número de caracteres menor ou igual ao número máximo de caracteres mudados entre duas palavras de um determinado tamanho, tendo estes sido previamente determinados e guardados num vector na função $initDictionary$.
+    Desta forma não só se garante o funcionamento do algoritmo a implementar como também se descarta a possibilidade de colocar todas as palavras de um certo tamanho na lista de cada palavra individual.
+    
+    \par Criados os grafos é então considerada a função $solveAllProblems$ que irá ler o ficheiro de problemas e resolve-los um a um, imprimindo os seus resultados para um ficheiro de saída.
+    Nesta função serão resolvidos diretamente os casos que dispensam a necessidade de cálculo de caminho, isto é, os casos onde as palavras do problema ou são a mesma ou diferem em apenas um caractere. Em ambos estes casos o caminho, assim como o seu custo, é imediato sendo então escrito logo no ficheiro de saída. 
+    \par Nos restantes casos será utilizado o algoritmo de Dijkstra que irá determinar o caminho mais curto.
+    Antes de mais será determinado o índice da palavra de origem e da palavra final no vector com palavras do mesmo tamanho, da Matriz Dicionário sendo então assim possível proceder ao cálculo do caminho. 
+    \par O funcionamento do algoritmo implementado está abaixo representado, na Figura \ref{fig:flux3}.
+    
+    
+    \begin{figure}
+        \includegraphics[width=\linewidth]{dijkstra.png}
+        \caption{Fluxograma do algoritmo de Dijkstra. }
+        \label{fig:flux3}
+    \end{figure}
+    
+    \par Após determinado o caminho este será então escrito, assim como o seu custo associado, no ficheiro de saída. Tanto a funçao que calcula o custo, calculateTotalCost, como função que escreve o caminho, a função $printPath$, se encontram também no ficheiro words.c, sendo a função $printPaths$ uma função recursiva de modo a garantir a correta ordem da escrita da solução. 
+	
+	\par Nas secções seguintes deste relatório serão abordados com maior atenção os restantes subsistemas criados assim como as estruturas de dados implementadas.
     
 \subsection{Descrição das estruturas de dados}
     \par A estrutura de dados que foi considerada a mais adequada para guardar o dicionário foi uma matriz, ou seja um vector de vectores, para diminuir os custos de memória e de acesso.
     \par Como referido acima, foi claro que seria necessária a representação do grafo tendo como base uma lista de adjacências, então foi implementada uma lista genérica. Esta é definida usando $void *$ (definido em datastructs.h, e a partir daqui referido como Item), para os quais se pode passar qualquer ponteiro, assegurando a generalidade da implementação. O grafo em si é um grafo adirecional e acíclico, o que facilitou a implementação.
     \par As listas definidas foram então utilizadas na definição do grafo pois este é implementado usando uma lista de adjacências. Os grafos foram definidos de forma genérica, com um reparo - a implementação dos dados usados na lista estão visíveis ao cliente. Todos os novos elementos desta lista são inseridos na primeira posição (head).
-    \par Como terá de existir um grafo para cada tamanho de palavras, decidiu-se usar um vetor para guardá-los no qual o índice corresponde ao tamanho das palavras representadas no grafo (i.e. all{\_}arrays[3] contêm o grafo das palavras de tamanho 3).
-    \par Por fim, a descrição do algorítmo de Dijkstra requer um acervo, também este definida de forma genérica no código. Neste caso, o acervo foi implementado usando uma fila prioritária, que por sua vez foi implementada usando um vector. Este vector tem um tamanho fixo, definido na sua incialização, mas usou-se outra vaŕiavel (q$\rightarrow$first) para que exista um ``vector virtual''  dentro do vector maior. Outra das variáveis que foi útil foi um vector indexado por vértices que diz onde o vértice está na heap (q$\rightarrow$vert{\_}pos), que evita que se tenha de fazer procura linear cada vez que se quer encontrar um vértice na heap.
+    \par Como é possível haver a necessidade de construir um grafo para cada tamanho de palavras, decidiu-se usar um vector para guardá-los, no qual o índice corresponde ao tamanho das palavras representadas no grafo (i.e. all{\_}arrays[3] contêm o grafo das palavras de tamanho 3).
+    \par Por fim, a descrição do algoritmo de Dijkstra requer um acervo, também este definido de forma genérica no código.
+     Neste caso, o acervo foi implementado usando uma fila prioritária, que foi por sua vez implementada usando um vector.
+      Este vector tem um tamanho fixo, definido na sua incialização, mas usou-se outra vaŕiavel (q$\rightarrow$first) para que exista um ``vector virtual''  dentro do vector maior. Outra das variáveis que foi útil foi um vector indexado por vértices que diz a posição de um vértice no acervo (q$\rightarrow$vert{\_}pos), o que evita que se tenha de fazer procura linear cada vez que se quer encontrar um vértice no acervo.
     
 \subsection{Descrição dos algoritmos utilizados}
-    \par O algorítmo utilizado para a criação do grafo é de complexidade $O(n^2)$, visto que não foi possível encontrar uma solução mais simples computacionalmente. Porém, não é necessário comparar todas as palavras a todas as palavras se se usar o algorítmo descrito pelo pseudo-código abaixo:
+    \par O algoritmo utilizado para a criação do grafo é de complexidade $O(n^2)$, visto que não foi possível encontrar uma solução mais simples computacionalmente. Porém, não é necessário comparar todas as palavras a todas as palavras se se usar o algoritmo descrito pelo pseudo-código abaixo:
     
     \begin{center}
         \texttt{\begin{tabular}{l}para i pertencente ao dicionário: \\
         \quad para todo j < i: \\
-        \quad\quad se i e j tiverem menos letras diferentes do que o custo máximo \\
+        \quad\quad se i e j tiverem menos ou o mesmo número de letras diferentes que o custo máximo: \\
         \quad\quad\quad ligar j a i \\
         \quad\quad\quad ligar i a j\\\end{tabular}}
     \end{center}
     
-    \par Este código reduz a complexidade do algorítmo de criação do grafo para $O(\frac{n^2}{2})$, o que não é ideal mas é melhor do que a alternativa.
+    \par Este código reduz a complexidade do algoritmo de criação do grafo para $O(\frac{n^2}{2})$, o que não é ideal mas é melhor do que a alternativa.
     
-    \par Mas claramente, o algorítmo crucial ao programa foi o algoritmo de Dijkstra, usando a variação que encontra o caminho mais curto entre dois vértices e não a que encontra o caminho mais curto entre um vértice e todos os outros vértices do grafo, ou seja, parando quando o elemento que sai da heap é o vértice a que se quer chegar.
+    \par Contudo, é claro que o algoritmo crucial ao programa foi o algoritmo de Dijkstra, usando a variação que encontra o caminho mais curto entre dois vértices e não a que encontra o caminho mais curto entre um vértice e todos os outros vértices do grafo, ou seja, parando quando o elemento que sai do acervo é o vértice a que se quer chegar.
     
-    \par Por fim, para a impressão da solução do problema para o ficheiro foram utilizados mais dois algorítmos: um para calcular o custo total e um para descobrir qual o caminho mais curto a partir do vector st, que é um argumento da função que implementa o algorítmo de Dijkstra.
-    \par O cálculo do custo consiste de com o vector st, descobrir todos os passos da solução (a ordem dos passos é indiferente). Assim, soma-se então o custo de cada passo até que o valor do vector st seja -1, ou seja, que se tenha chegado ao vértice inicial. A impressão do custo teve de ser pensada de forma diferente, visto que a ordem interessa neste caso. Por isso, para garantir que os resultados estariam correctos, considerou-se que a forma mais simples seria implementar recorrendo a um algorítmo recursivo.
-    \par Este algorítmo, sendo recursivo, necessita de uma condição de saída. Neste caso, a função retorna sem chamar-se a si mesma se argumento passado equivale ao índice do array que representa o vértice original. Caso esta condição não se verifique, a função chama-se a si mesma e imprime a palavra equivalente para o ficheiro de saída.
+    \par Por fim, para a impressão da solução do problema para o ficheiro foram utilizados mais dois algoritmos: um para calcular o custo total e um para descobrir qual o caminho mais curto a partir do vector st, que é um argumento da função que implementa o algoritmo de Dijkstra.
+    \par O cálculo do custo consiste em, com o vector st, descobrir todos os passos da solução (a ordem dos passos é indiferente). Assim, soma-se então o custo de cada passo até que o valor do vector st seja -1, ou seja, que se tenha chegado ao vértice inicial. A impressão do custo teve de ser pensada de forma diferente, visto que a ordem é relevante neste caso. Por isso, para garantir que os resultados estariam correctos, considerou-se que a forma mais simples seria implementar recorrendo a um algoritmo recursivo.
+    \par Este algoritmo, sendo recursivo, necessita de uma condição de saída. Neste caso, a função retorna sem chamar-se a si mesma se argumento passado equivale ao índice do vector que representa o vértice original. Caso esta condição não se verifique, a função chama-se a si mesma e imprime a palavra equivalente para o ficheiro de saída.
     
 \section{Subsistemas funcionais}
-    \par Como já referido, existem três subsistemas funcionais:
+    \par Como já referido, existem três módulos implementados:
     \begin{description}[align=left]
        \item[datastructs.c] Implementa os três tipos de dados essenciais - listas ligadas, grafos e acervos. Inclui as funções requiridas por cada tipo de dados, como a inicialização, libertação de memória e funções de interface para que o cliente possa interagir com as estruturas.
-       \item[utils.c] Funções variadas que não fariam sentido estar noutro ficheiro. Tem funções que lidam com a abertura de ficheiros, comparações, e a implementação do algorítmo de Dijkstra.
-       \item[words.c] Encontra-se tudo que se relaciona diretamente com a resolução do problema, como por exemplo a determinação da maior permutação e a leitura das palavras dos ficheiros de dicionário e problemas.
+       \item[utils.c] Funções variadas que não fariam sentido estar noutro ficheiro. Tem funções que lidam com a abertura de ficheiros, comparações, e a implementação do algoritmo de Dijkstra.
+       \item[words.c] Aqui encontra-se tudo aquilo que se relaciona diretamente com a resolução do problema, como por exemplo a determinação da maior permutação e a leitura das palavras dos ficheiros de dicionário e problemas.
     \end{description}
     
 \subsection{datastructs.c}
-    \begin{itemize}
+    \par Funções de manipulação de listas simplesmente ligadas:
+
+    \begin{itemize}    
+    \item node * initLinkedList();
+    \par Função que inicializa uma lista simplesmente ligada.
+    
+    \item node * newNode(Item data, node *next);
+    \par Função que cria um novo nó de uma lista simplesmente ligada.
+    
+    \item Item getData(node *cur);
+    \par Função que devolve a data num nó de uma lista.
+    
+    \item node * insertList(node *first, Item item);
+    \par Função que cria e insere um novo nó de uma lista simplesmente ligada no início da lista.
+   
+    \item node * nextNode(node *cur);
+    \par Função que devolve o próximo nó de uma lista simplesmente ligada.
+    
+    \item node * changeNodeData(node *old, Item new{\_}data);
+    \par Função que altera a data de um nó de uma lista.
+    
+    \item void freeLinkedList(node *head, void (* freeItem)(Item));
+    \par Função que liberta a memória alocada para uma lista simplesmente ligada.
+    \end{itemize}
+
+    \par Funções de manipulação de grafos implementados com lista de adjacência:
+    \begin{itemize}  
+    \item graph * graphInit(int vert{\_}num);
+    \par Função que inicializa um grafo com um número de vértices introduzido. 
+    
+    \item int graphGetVert(graph *g);
+    \par Função que devolve o número de vértices de um grafo.
+    
+    \item node ** graphGetAdj(graph *g);
+    \par Função que devolve o vector de listas de adjacência de um grafo.
+    
+    \item int getGraphVertex(Item info);
+    \par Função que devolve o valor do vértice num node de uma lista de adjacência.
+
+    \item int getGraphWeight(Item info);
+    \par Função que devolve o peso do vértice num node de uma lista de adjacência.
+    
+    \item void freeGraph(graph *g, void (* freeItem)(Item));
+    \par Função que liberta a memória alocada para um grafo. Liberta ainda cada lista de adjacência.
+
+
+    \end{itemize}
+    \par Funções de manipulação de acervo:
+    \begin{itemize}  
+    \item queue * queueInit(int size);
+    \par Função que inicializa um acervo, tendo os seus dois vectores tamanho igual ao introduzido na função. 
+    
+    \item Item * queueGetData(queue *q);
+    \par Função que devolve o vector data de um acervo.
+    
+    \item void changeQueueData(queue *q, int idx, Item new{\_}value);
+    \par Função que altera o conteúdo de um elemento do vector data de um acervo.
+    
+    \item int emptyHeap(queue *q);
+    \par Função que devolve se um acervo está vazio ou não.
+
+    \item void insertInHeap(queue *q, Item data, int (* compItem)(Item item1, Item item2));
+    \par Função que insere data na primeira posição livre do vector data de um acervo e faz FixUp para recuperar a condição de acervo .
+    
+    \item void fixUp(queue *q, int idx, int (* compItem)(Item item1, Item item2)) ;
+    \par Função que realiza FixUp de modo a recuperar a condição de acervo.
+
+    \item void fixDown(queue *q, int idx, int n, int (* compItem)(Item item1, Item item2)) ;
+    \par Função que realiza FixDown de modo a recuperar a condição de acervo.
+    
+    \item int findQueueV(queue *q, int vertex);
+    \par Função que devolve a posição de um determinado vértice no acervo.
+
+    \item int getQSize(queue *q) ;
+    \par Função que devolve o atual tamanho do acervo.
+    
+    \item Item removeHeap(queue *q, int (* compItem)(Item item1, Item item2));
+    \par Função que retira o elemento de menor peso do vector data do acervo, e reordena através do FixDown de modo a manter a condição de acervo.
+
+	\item void freeHeap(queue *q) ;
+    \par Função que liberta a memória alocada para um acervo.
+    \end{itemize}
+	\par Função que cria um novo elemento g{\_}data *:
+        \begin{itemize}  
+
+	\item g{\_}data * newGData(int weight, int vertex)
+	\par Função que cria um novo elemento do tipo g{\_}data *, o preenche e o devolve.
     \end{itemize}
     
 \subsection{utils.c}
@@ -138,7 +263,7 @@
     \par Serve para baixar a prioridade de algo numa fila prioritária - neste caso, baixa o peso de um elemento da fila.
     
     \item void dijkstra(graph *g, int s, int end, int max{\_}step, int *st, int *wt);
-    \par Implementa o algorítmo de Dijkstra, usando uma fila prioritária.
+    \par Implementa o algoritmo de Dijkstra, usando uma fila prioritária.
     
     \item void writefirstOutput(FILE * fp, char * word, int cost);
     \par Escreve a primeira linha da solução para o ficheiro, visto que é diferente das restantes.
@@ -148,7 +273,6 @@
     
     \item void freeMatrix(char ***mat, int *size, int init{\_}size);
     \par Liberta uma matriz de caracteres. Note-se que assume-se que o tamanho da matriz pode ser variável, por isso é que se passa o vector size.
-    
     \end{itemize}
 
 \subsection{words.c}
@@ -170,13 +294,13 @@
     \par Inicializa os grafos necessários para a resolução do problema, tendo em conta a permutação máxima entre palavras.
     
     \item void printPath(FILE *output, int w{\_}size, int *st, int origin{\_}v, int final{\_}v, char **dic[MAX\-{\_}STRING], int cur);
-    \par Imprime o caminho entre duas palavras, usando um algorítmo recursivo. Não imprime nem a primeira nem a última palavra.
+    \par Imprime o caminho entre duas palavras, usando um algoritmo recursivo. Não imprime nem a primeira nem a última palavra.
     
     \item int calculateTotalCost(int *st, int final{\_}v, char **dic);
     \par Calcula o custo total do caminho, dado o vector st e o vértice final.
     
     \item void solveAllProblems(FILE *input, FILE *output, graph **all{\_}graphs, char **dictionary[MAX\-{\_}STRING], int *size{\_}array);
-    \par  Itera pelos problemas do ficheiro, lida com eles da forma apropriada (chamando ou não o algorítmo de Dijkstra) e chama as funções que escrevem os resultados para o ficheiro.
+    \par  Itera pelos problemas do ficheiro, lida com eles da forma apropriada (chamando ou não o algoritmo de Dijkstra) e chama as funções que escrevem os resultados para o ficheiro.
     
     \item void problemSolver(FILE *dic, FILE *prob, FILE *path);
     \par A função principal do problema - chama as funções que criam os grafos, o dicionário, que resolvem os problemas e que libertam a memória.
@@ -190,13 +314,18 @@
     \par Examinando o programa, chega-se à conclusão de que existem duas grandes partes que contribuem para a complexidade. Em ambos os casos, $v$ representa o número total de palavras com o mesmo tamanho e $e$ representa o número de ligações que existem entre palavras.
     \begin{description}[align=left]
         \item[Criação de grafo] Para inserir todas as palavras no grafo, é necessário comparar todas as palavras duas a duas. No código, como para cada palavra do dicionário só é necessário comparar as palavras anteriores a esta, o que acontece é $1 + 2 + 3 + ... + v = \frac{v^2}{2} + \frac{v}{2}$, que é majorado por $v^2$ concluindo-se então que a complexidade será $O(v^2)$.
-        \par Em termos de memória, a complexidade será de $O(e^2)$, visto que numa lista de adjacências de um grafo não direccionado uma ligação é reperesentada por dois nós.
-        \item[Algorítmo de Dijkstra] No caso do problema a resolver, observa-se que o grafo que representa as ligações é um grafo esparso (menos do que $|v^2|$ ligações). Assim, esta implementação do algorítmo de Dijkstra, usando uma lista de adjacências e um acervo, corre em $\Uptheta((|e| + |v|)log(|v|))$, como há uma estrutura de dados auxiliar que indica aonde está cada vértice na heap, fazendo com que a procura seja $O(1)$.
+        \par Em termos de memória, aloca-se um vector de ponteiros para grafo, que podem ou não apontar para NULL dependendo da existência do grafo. Cada grafo vai ter a sua própria lista de adjacências, alocando então um vector de ponteiros para node, que também podem ou não apontar para NULL. No caso de não apontarem para NULL, apontam então para a cabeça de uma lista de tamanho variável que contêm todos as palavras a que uma dada palavra está ligada. Então, conclui-se a complexidade em termos de memória será de $O(e^2)$, visto que numa lista de adjacências de um grafo não direccionado uma ligação é reperesentada por dois nós.
+        \item[Algorítmo de Dijkstra] No caso do problema a resolver, observa-se que o grafo que representa as ligações é um grafo esparso, isto é, com menos de $|v^2|$ ligações. Assim, esta implementação do algoritmo de Dijkstra, usando uma lista de adjacências e um acervo, corre em $\Uptheta((|e| + |v|)log(|v|))$, como há uma estrutura de dados auxiliar que indica a posição de cada vértice no acervo, fazendo com que a procura seja $O(1)$.
+        \par Todas as vezes que a função que implementa o algoritmo de Dijkstra é chamada, aloca-se memória para o acervo, que depende do número de palavras com o mesmo tamanho. Cada elemento saído do acervo é logo libertado após o fim da sua avaliação, sendo o acervo libertado no fim da chamada, visto já não ser necessária.
     \end{description}
 
-\section{Análise do programa}
-    \par Na supefície, o problema é simples - no entanto é necessária alguma cautela para alguns casos limite e para alguns descuidos que podem aumentar e muito o tempo de execução do problema. Um destes descuidos foi a procura de um determinado vértice dentro da \textit{heap} - a abordagem \textit{naïve} utilizada inicialmente tinha complexidade $O(n)$, o que considando as vezes que era necessário descobrir o vértice, ``estragava'' a rapidez do algorítmo de Dijkstra.
+\section{Análise crítica do programa}
+    \par À supefície, o problema aparenta ser simples - no entanto é necessária alguma cautela para alguns casos limite e para alguns descuidos que podem aumentar e muito o tempo de execução do problema. Por exemplo, após uma implementação inicial do algoritmo de Dijkstra, observou-se que o tempo de execução era muito superior ao esperado. Um dos erros efectuados incialmente envolvia a procura de um determinado vértice dentro do acervo - a abordagem \textit{naïve} utilizada inicialmente tinha complexidade $O(n)$, o que considando as vezes que era necessário descobrir o vértice, ``estragava'' a rapidez do algoritmo de Dijkstra.
     \par Outro problema, que foi mais trivial de resolver, foi o facto de que não foram antecipados certos tipos de problemas, nomeadamente que a palavra de partida fosse igual à palavra de chegada e que a diferença entre as palavras fosse apenas de uma letra.
+    \par Porém, a parte menos direta do projecto foi de facto implementar as estruturas de dados de forma genérica, ou seja, que pudessem ser facilmente utilizadas para outros programas. Como a implementação estava incluída no ficheiro datastructs.c e não em datastructs.h, o compilador era incapaz de aceder a dados que se encontrassem dentro da estrutura de forma direta - de modo que foi necessário criar uma função de acesso para cada variável de cada estrutura.
+    \par Para além disso, foi necessário passar como argumento funções auxiliares - isto é funções escritas à parte, desenhadas para lidar com cada tipo específico, como por exemplo funções de comparação. Como os argumentos das funções e os tipos de dados estavam definidos para usar Items, não foi possível tomar certas coisas como certas (e.g. funções de comparação). Estas últimas causaram alguns problemas graças aos ponteiros.
+    \par Apesar destes pequenos contratempos, todas as decisões, quer em termos de estruturas de dados utilizadas, quer em termos de lógica, foram tomadas visando obter um melhor equilíbrio em termos da complexidade do implementado e da quatidade de memória utilizada. 
+	\par Visto que o programa passou nos 20 testes aplicados considera-se que o programa criado teve um desempenho satisfatório.
 
 \section{Exemplo}
     \par De seguida será ilustrado o funcionamento do programa de forma a demonstrar o racíocinio implementado, acima descrito. 
@@ -205,7 +334,6 @@
         \texttt{\begin{tabular}{l}gotas bisturi agente corpo \\
         pausa trampolim parte zebra casta \\
         cobertor liberdade casto gorro  \\
-        ...
         \end{tabular}}
         \end{center}
            
@@ -219,9 +347,9 @@
         \end{center}
         
     \par O programa desenvolvido irá antes de mais confirmar as extensões dos ficheiros introduzidos na linha de comandos. Visto que ambos possuem a extensão correta será criado o nome do ficheiro de saída com o mesmo do .pal mas com a extensão .path, ou seja pexemplo.path.
-	\par De seguida será lido o ficheiro pexemplo.pal e criado um vetor, problem{\_}array, inicializado a zero com tamanho MAX{\_}STRING = 100, com o custo máximo de mutação para cada tamanho de palavra representado no ficheiro de problemas relevante à resolução. 
-    Isto é, na posição 5 terá o valor 3 visto ser a mutação máxima permitida entre palavras de tamanho 5 e tanto na posição 6 como na 8, manterão o valor 0 visto que os únicos problemas envolvendo palavras de tamanho 6  e de tamanho 8 podem ser resolvidos diretamente sem a necessidade de grafos. Na função seguinte será preenchido o vetor de número de ocurrências de tamanhos de palavras no ficheiro .dic, estando este inicializado a zero. 
-	\par Visto que o único tamanho com um valor na posição respectiva do problem{\_}array maior que zero é o 5 serão contadas o número de palavras de tamanho 5 no ficheiro, ficando então na posição 5 deste vetor o valor 7.
+	\par De seguida será lido o ficheiro pexemplo.pal e criado um vector, problem{\_}array, inicializado a zero com tamanho MAX{\_}STRING = 100, com o custo máximo de mutação para cada tamanho de palavra representado no ficheiro de problemas relevante à resolução. 
+    Isto é, na posição 5 terá o valor 3 visto ser a mutação máxima permitida entre palavras de tamanho 5 e tanto na posição 6 como na 8, manterão o valor 0 visto que os únicos problemas envolvendo palavras de tamanho 6  e de tamanho 8 podem ser resolvidos diretamente sem a necessidade de grafos. Na função seguinte será preenchido o vector de número de ocurrências de tamanhos de palavras no ficheiro .dic, estando este inicializado a zero. 
+	\par Visto que o único tamanho com um valor na posição respectiva do problem{\_}array maior que zero é o 5 serão contadas o número de palavras de tamanho 5 no ficheiro, ficando então na posição 5 deste vector o valor 7.
 	\par Seguidamente será então criada a matriz que representa o dicionário, que terá, na posição 5:
 	
 		\begin{center}
@@ -230,7 +358,7 @@
         }
         \end{center}
 	
-	\par Após alocada memória para um vetor de grafos, que apenas irá conter um grafo com as palavras de tamanho 5, será preenchida a sua lista de adjacência tendo cada palavra na sua lista apenas palavras que dela diferem 3 ou menos caracteres.
+	\par Após alocada memória para um vector de grafos, que apenas irá conter um grafo com as palavras de tamanho 5, será preenchida a sua lista de adjacência tendo cada palavra na sua lista apenas palavras que dela diferem 3 ou menos caracteres.
 	
         \begin{center}
         \texttt{\begin{tabular}{l}Adj[0] para gotas : gorro \\
@@ -252,13 +380,13 @@
         \end{tabular}}
         \end{center}
 	
-	\par Para o segundo problema o mesmo já não se verifica sendo portanto necessaŕio recorrer ao algorítmo de Dijkstra. Antes de mais, serão comparadas as palavras do problema com as do mesmo tamanho inseridas no dicionário, de modo a determinar o valor do vértice inicial e final correspondente ao índice destas palavras no vetor de palavras do mesmo tamanho contido na matriz que representa o dicionário.
+	\par Para o segundo problema o mesmo já não se verifica sendo portanto necessaŕio recorrer ao algoritmo de Dijkstra. Antes de mais, serão comparadas as palavras do problema com as do mesmo tamanho inseridas no dicionário, de modo a determinar o valor do vértice inicial e final correspondente ao índice destas palavras no vector de palavras do mesmo tamanho contido na matriz que representa o dicionário.
 	\par Neste caso o vértice inicial terá o valor 0 e o final o valor 5. 
 	
-	\par Já no algoritmo será inicalizada o acervo, cujos vetores terão ambos um tamanho inicial de 7, sendo o peso de cada vértice definido como MAX{\_}WT. Serão ainda inicializados os vetores st e wt, também de tamanho 7, com o valor -1 e MAX{\_}WT, respetivamente. O peso do vértice inicial 0, tanto no acervo como no vetor wt, passará para 0 e será de seguida realizado o fixUp do acervo para o restaurar.
+	\par Já no algoritmo será inicalizada o acervo, cujos vectores terão ambos um tamanho inicial de 7, sendo o peso de cada vértice definido como MAX{\_}WT. Serão ainda inicializados os vectores st e wt, também de tamanho 7, com o valor -1 e MAX{\_}WT, respetivamente. O peso do vértice inicial 0, tanto no acervo como no vector wt, passará para 0 e será de seguida realizado o fixUp do acervo para o restaurar.
 	\par Na tabela \ref{ac} apresenta-se uma ilustração da evolução do acervo ao longo do algoritmo.	
 	
-    \begin{table}
+    \begin{table}[h]
         \begin{center}
         \begin{tabular}{llllllllllllll}
             \multicolumn{7}{l}{\textbf{Acervo Inicializado:}}                                                                          & 0          & 1          & 2          & 3          & 4          & 5          & 6          \\
@@ -277,9 +405,9 @@
     \end{table}
 	
 	\par É de notar que após a remoção do vértice de menor peso do acervo, serão verificados os vértices seus adjacentes para a otimização do caminho. Isto é, depois de retirado o vértice 0 será analisado o vértice 6 que apresenta um melhor caminho passando este a ser o de menor peso no acervo. Analogamente será considerado o vértice 1 e por fim o vértice 5 que corresponde ao vértice final.
-	\par Quando o vértice retirado do acervo corresponder ao vértice final é possível então terminar este processo, estando o caminho representado no vetor st. 
+	\par Quando o vértice retirado do acervo corresponder ao vértice final é possível então terminar este processo, estando o caminho representado no vector st. 
 	
-	\par O vetor st obtido está representado na tabela \ref{vct}.
+	\par O vector st obtido está representado na tabela \ref{vct}.
     
     \begin{table}[]
 	\centering
@@ -292,7 +420,7 @@
 	\label{st2}
 	\end{table}
     
-    \par Obtido este vetor será impresso o caminho no ficheiro .path, sendo esta escrita realizada rescursivamente. 
+    \par Obtido este vector será impresso o caminho no ficheiro .path, sendo esta escrita realizada rescursivamente. 
 	
 	\begin{center}
         \texttt{\begin{tabular}{l}gotas 22\\
@@ -313,7 +441,7 @@
         
     \par O quarto problema é, por sua vez, análogo ao segundo problema, estando a evolução do acervo representada na Tabela \ref{acv4}.
     
-    \begin{table}[]
+    \begin{table}[h]
 	\centering
 	\begin{tabular}{llllllllllllll}
 	\multicolumn{7}{l}{\textbf{Acervo Inicializado:}}      & 0          & 1          & 2          & 3          & 4          & 5          & 6          \\
@@ -329,9 +457,9 @@
 	\label {acv4}
 	\end{table}
 		
-	\par Neste caso não foi encontrado um caminho que satisfizesse o custo máximo permitido entre mutações, isto é, no máximo 2 caracteres de uma vez.	
+	\par Neste caso não foi encontrado um caminho que satisfizesse o custo máximo permitido entre mutações, isto é, no máximo 2 caracteres de uma vez.
     
-    \begin{table}[]
+    \begin{table}[h]
 	\begin{center}
 	\begin{tabular}{|l|c|c|c|c|c|c|c|}
     \hline
@@ -344,7 +472,7 @@
     \end{center}
 	\end{table} 
 	
-	\par Obtido este vetor será indicado no ficheiro .path a inexistência de caminho da seguinte forma:
+	\par Obtido este vector será indicado no ficheiro .path a inexistência de caminho da seguinte forma:
     
     \begin{center}
         \texttt{\begin{tabular}{l}zebra -1 \\
@@ -352,7 +480,15 @@
         \end{tabular}}
     \end{center}
 
+\FloatBarrier
 \section{Bibliografia}
-
+    \par Na realização deste projeto foram consultados os seguintes $websites$:
+ 
+    \begin{itemize}
+    \item http://www.algolist.net/
+    \item http://stackoverflow.com/
+    \item http://www.cprogramming.com/algorithms-and-data-structures.html
+    
+    \end{itemize}
 
 \end{document}
